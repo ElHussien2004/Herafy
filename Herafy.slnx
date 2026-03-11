@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/Core/">
+    <Project Path="Coer/Domain/Domain.csproj" />
+    <Project Path="Coer/Service/Service.csproj" />
+    <Project Path="Coer/ServiceAbstraction/ServiceAbstraction.csproj" />
+  </Folder>
+  <Folder Name="/Infrastructure/">
+    <Project Path="Infrastructure/Persistence/Persistence.csproj" />
+    <Project Path="Infrastructure/Presentation/Presentation.csproj" />
+  </Folder>
+  <Project Path="Herafy.API/Herafy.API.csproj" />
+  <Project Path="Shared/Shared.csproj" />
+</Solution>
