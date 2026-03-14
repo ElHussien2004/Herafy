@@ -23,8 +23,6 @@ namespace Persistence.Data.Configrations
                    .IsRequired()
                    .HasMaxLength(100);
 
-            
-
             builder.Property(x => x.Latitude)
                    .HasColumnType("decimal(9,6)")
                    .IsRequired();

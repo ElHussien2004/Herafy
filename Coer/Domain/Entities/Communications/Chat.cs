@@ -12,12 +12,9 @@ namespace Domain.Entities.Communications
     {
         public string ClientId { get; set; }
         public Client Client { get; set; }
-
         public string TechnicianId { get; set; }
         public Technician Technician { get; set; }
-  
         public DateTime LastMessageAt { get; set; }
-
         public ICollection<Message> Messages { get; set; }
     }
 }

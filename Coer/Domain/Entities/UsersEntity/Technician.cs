@@ -16,7 +16,6 @@ namespace Domain.Entities.UsersEntity
 
         #region Relation User
         public string UserId { get; set; }//Fk
-
         public ApplicationUser User { get; set; }
         #endregion
 

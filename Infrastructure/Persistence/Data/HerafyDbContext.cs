@@ -23,9 +23,7 @@ namespace Persistence.Data
         public DbSet <Order> Orders { get; set; }
         public DbSet<Review> Reviews { get; set; }
         public DbSet <ServiceCategory> ServiceCategories { get; set; }
-
         public DbSet<TechnicianDocument> Documents { get; set; }
-
         public DbSet<Notification> Notifications { get; set; }
         public DbSet <Chat> Chats { get; set; }
         public DbSet <Message > Messages { get; set; }

@@ -18,8 +18,6 @@ namespace Domain.Entities.Communications
 
         public NotificationType Type { get; set; }
 
-       
-
         public bool IsRead { get; set; }
 
         public DateTime CreatedAt { get; set; }

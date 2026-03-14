@@ -23,8 +23,6 @@ namespace Persistence.Data.Configrations
                    .IsRequired()
                    .HasMaxLength(100);
 
-            
-
             builder.Property(x => x.IsActive)
                    .HasDefaultValue(false);
 

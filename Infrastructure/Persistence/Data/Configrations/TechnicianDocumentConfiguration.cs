@@ -19,8 +19,7 @@ namespace Persistence.Data.Configrations
                    .IsRequired();
 
             builder.Property(x => x.BackImageUrl)
-                   .IsRequired();
-                  
+                   .IsRequired();  
 
             builder.Property(x => x.UploadedAt)
                    .HasDefaultValueSql("GETDATE()");
