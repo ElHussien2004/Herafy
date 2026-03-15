@@ -7,7 +7,8 @@ using System.Threading.Tasks;
 
 namespace Domain.Contracts
 {
-    public interface IGenericRepository<TEntity, TKey>where TEntity : BaseEntity<TKey>
+
+    public interface IGenericRepository<TEntity, TKey> where TEntity : BaseEntity<TKey>
     {
         Task<IEnumerable<TEntity>> GetAllAsync();
 
@@ -18,5 +19,6 @@ namespace Domain.Contracts
         void Update(TEntity entity);
 
         void Remove(TEntity entity);
+
     }
 }
