@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Persistence.Data;
+using Service;
+using ServiceAbstraction;
 
 namespace Herafy.Api
 {
@@ -27,6 +29,9 @@ namespace Herafy.Api
                 Options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
             });
 
+            //builder.Services.AddScoped<IFileService, FileService>();
+            //builder.Services.AddScoped<ITechnicianService, TechnicianService>();
+      
             var app = builder.Build();
             // Configure the HTTP request pipeline.
             // Middleware

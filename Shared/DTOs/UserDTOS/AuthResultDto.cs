@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Shared.UserDTOS
+namespace Shared.DTOs.UserDTOS
 {
     public class AuthResultDto
     {
