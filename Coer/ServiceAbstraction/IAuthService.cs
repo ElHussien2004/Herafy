@@ -1,4 +1,4 @@
-﻿using Shared.UserDTOS;
+﻿using Shared.DTOs.UserDTOS;
 using System;
 using System.Collections.Generic;
 using System.Linq;

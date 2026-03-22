@@ -12,8 +12,6 @@ namespace Domain.Entities.UsersEntity
 {
     public class Technician : BaseEntity<string>
     {
-
-
         #region Relation User
         public string UserId { get; set; }//Fk
         public ApplicationUser User { get; set; }
