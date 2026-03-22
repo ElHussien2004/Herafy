@@ -12,6 +12,7 @@ namespace Domain.Contracts
     {
         public IGenericRepository<Technician,string> TechnicalRepository { get; }
         public IGenericRepository<Client, string> ClientRepository { get; }
+
         Task<int> SaveAsync();
 
     }

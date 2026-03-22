@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Persistence.Data;
 using Service;
+using Service.MappingProfiles;
 using ServiceAbstraction;
 
 namespace Herafy.Api
@@ -31,6 +32,7 @@ namespace Herafy.Api
 
             //builder.Services.AddScoped<IFileService, FileService>();
             //builder.Services.AddScoped<ITechnicianService, TechnicianService>();
+            builder.Services.AddAutoMapper(a => a.AddProfile(new TechnicianProfile()));
       
             var app = builder.Build();
             // Configure the HTTP request pipeline.
