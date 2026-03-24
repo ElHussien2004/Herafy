@@ -10,10 +10,10 @@ using System.Threading.Tasks;
 
 namespace Domain.Entities.UsersEntity
 {
-    public class Technician : BaseEntity<string>
+    public class Technician :BaseEntity<string>
     {
         #region Relation User
-        public string UserId { get; set; }//Fk
+        public string UserId { get; set; }//Fk +pk
         public ApplicationUser User { get; set; }
         #endregion
 
@@ -40,6 +40,10 @@ namespace Domain.Entities.UsersEntity
         public decimal InspectedPrice { get; set; }
 
         public int CompletedJobs { get; set; }
+
+        public string City { get; set; }
+
+        public string Government { get; set; }
 
         public bool IsActive { get; set; }
         public TechnicianDocument Document { get; set; }

@@ -20,23 +20,30 @@ namespace Service
             return _mapper.Map<IEnumerable<TechnicianDto>>(technicians);
         }
 
-        public async Task<TechnicianDto?> GetByIdAsync(string id)
+        public async Task<TechnicianDetailsDto?> GetByIdAsync(string id)
         {
             var technician = await _unitOfWork.TechnicalRepository.GetByIdAsync(id);
 
             if (technician == null)
                 return null;
 
-            return _mapper.Map<TechnicianDto>(technician);
+            return _mapper.Map<TechnicianDetailsDto>(technician);
         }
 
         public async Task AddAsync(AddTechnicianDto technicianDto)
         {
+
             var technician = _mapper.Map<Technician>(technicianDto);
 
             await _unitOfWork.TechnicalRepository.AddAsync(technician);
 
             await _unitOfWork.SaveAsync();
+
+            //get user by id 
+            // assign fullname ,pictureurl ,
+            //store photo in wwroot return url
+            //create technicain 
+
         }
 
         public async Task UpdateAsync(UpdateTechnicianDto technicianDto)

@@ -1,5 +1,5 @@
 ﻿using ServiceAbstraction;
-using Shared.UserDTOS;
+using Shared.DTOs.UserDTOS;
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;

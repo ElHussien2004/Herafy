@@ -13,7 +13,7 @@ namespace Persistence.Data.Configrations
     {
         public void Configure(EntityTypeBuilder<Client> builder)
         {
-            builder.HasKey(x => x.Id);
+            builder.HasKey(x => x.UserId);
 
             builder.Property(x => x.City)
                    .IsRequired()

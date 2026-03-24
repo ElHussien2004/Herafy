@@ -18,6 +18,7 @@ namespace Persistence.Repositories
         private readonly Lazy<IGenericRepository<Client, string>> _clientRepo =
             new(() => new GenericRepository<Client, string>(_Context));
         public IGenericRepository<Client, string> ClientRepository => _clientRepo.Value;
+
         public Task<int> SaveAsync() => _Context.SaveChangesAsync();
     }
 }

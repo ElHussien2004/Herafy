@@ -9,10 +9,10 @@ using System.Threading.Tasks;
 
 namespace Domain.Entities.UsersEntity
 {
-    public class Client : BaseEntity<string>
+    public class Client 
     {
         #region Relation ApplicationUser
-        public string UserId { get; set; }//FK
+        public string UserId { get; set; }//FK+pk
         public ApplicationUser User { get; set; }
 
         #endregion

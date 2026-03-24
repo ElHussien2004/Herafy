@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace Domain.Contracts
 {
 
-    public interface IGenericRepository<TEntity, TKey> where TEntity : BaseEntity<TKey>
+    public interface IGenericRepository<TEntity, TKey> 
     {
         Task<IEnumerable<TEntity>> GetAllAsync();
         Task<TEntity?> GetByIdAsync(TKey id);

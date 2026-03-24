@@ -13,7 +13,7 @@ namespace Persistence.Repositories
 {
     public class GenericRepository<TEntity, TKey>(HerafyDbContext _dbContext)
         : IGenericRepository<TEntity, TKey>
-        where TEntity : BaseEntity<TKey>
+        where TEntity : class
     {
         public async Task AddAsync(TEntity entity)
             => await _dbContext.Set<TEntity>().AddAsync(entity);

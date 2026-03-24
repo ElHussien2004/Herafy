@@ -1,3 +1,4 @@
+using Domain.Contracts;
 using Domain.Entities.UsersEntity;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
@@ -5,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Persistence.Data;
+using Persistence.Repositories;
 using Service;
 using Service.MappingProfiles;
 using ServiceAbstraction;
@@ -29,9 +31,11 @@ namespace Herafy.Api
             {
                 Options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
             });
-
-            //builder.Services.AddScoped<IFileService, FileService>();
-            //builder.Services.AddScoped<ITechnicianService, TechnicianService>();
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+            builder.Services.AddScoped<ISMSService,SMSService>();
+            builder.Services.AddScoped<ITechnicianService, TechnicianService>();
+            builder.Services.AddScoped<IFileService, FileService>();
+            builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddAutoMapper(a => a.AddProfile(new TechnicianProfile()));
       
             var app = builder.Build();

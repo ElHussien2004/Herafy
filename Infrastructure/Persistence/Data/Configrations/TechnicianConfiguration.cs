@@ -13,7 +13,7 @@ namespace Persistence.Data.Configrations
     {
         public void Configure(EntityTypeBuilder<Technician> builder)
         {
-            builder.HasKey(x => x.Id);
+            builder.HasKey(x => x.UserId);
 
             builder.Property(x => x.Bio)
                    .HasMaxLength(1000);
