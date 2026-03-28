@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Service
 {
-    public class ServiceManager(IConfiguration configuration,IUnitOfWork unitOfWork,IFileService fileService,IMapper mapper,IConnectionMultiplexer connection,ISMSService sMS ) : IServiceManager
+    public class ServiceManager(IConfiguration configuration,IUnitOfWork unitOfWork,IFileService fileService,IMapper mapper,IConnectionMultiplexer connection,ISMSService sMS,UserManager<ApplicationUser> userManager ) : IServiceManager
     {
         private readonly Lazy<ISMSService> _LazysmsService = new Lazy<ISMSService>(() => new SMSService(configuration));
         public ISMSService SMSService =>_LazysmsService.Value;
@@ -21,7 +21,7 @@ namespace Service
 
         public IFileService FileService => _LazyFileService.Value;
 
-        private readonly Lazy<ITechnicianService> _LazyTechnicianService = new Lazy<ITechnicianService>(() => new TechnicianService(mapper,unitOfWork, fileService));
+        private readonly Lazy<ITechnicianService> _LazyTechnicianService = new Lazy<ITechnicianService>(() => new TechnicianService(mapper,unitOfWork, fileService, userManager));
 
         public ITechnicianService TechnicianService => _LazyTechnicianService.Value;
 

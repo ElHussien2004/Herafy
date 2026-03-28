@@ -99,83 +99,189 @@ namespace Service
 
 
 
-
-
-        public async Task UpdateAsync(UpdateTechnicianDto technicianDto)
+        public async Task<Result> UpdateAsync(UpdateTechnicianDto technicianDto)
         {
+
+            if (technicianDto == null)
+                return Error.Validation("بيانات غير صالحة", "البيانات المرسلة فارغة");
+            //GET USER update fullname ,image 
+            var user = await userManager.FindByIdAsync(technicianDto.Id);
+            if (user == null)
+                   return Error.NotFound("المستخدم غير موجود", $"لا يوجد مستخدم بالمعرف {technicianDto.Id}");
+            user.FullName=  technicianDto.FullName;
+            if (technicianDto.ImageUrl != null && technicianDto.ImageUrl.Length > 0)
+            {
+                var uploadResult = await _fileService.SaveFileAsync(technicianDto.ImageUrl, "ProfileImage");
+                if (!uploadResult.IsSuccess)
+                    return uploadResult;
+                user.ProfileImageURL = uploadResult.Value;
+            }
+            var updateResult = await userManager.UpdateAsync(user);
+
+            if (!updateResult.Succeeded)
+                return Error.Failure(
+                    "فشل تحديث المستخدم",
+                    string.Join(", ", updateResult.Errors.Select(e => e.Description))
+                );
+
+            // get tec 
             var technician = await _unitOfWork.TechnicalRepository.GetByIdAsync(technicianDto.Id);
-
             if (technician == null)
-                throw new KeyNotFoundException("Technician not found");
+                return Error.NotFound("الفني غير موجود", $"لا يوجد فني بالمعرف {technicianDto.Id}");
 
-            _mapper.Map(technicianDto, technician);
-           _unitOfWork.TechnicalRepository.Update(technician);
-            await _unitOfWork.SaveAsync();
+            technician.Bio  = technicianDto.Bio;
+            technician.ExperienceYears = technicianDto.ExperienceYears;
+            technician.InspectedPrice = technicianDto.InspectedPrice;
+
+            //update tec
+            _unitOfWork.TechnicalRepository.Update(technician);
+            try
+            {
+                await _unitOfWork.SaveAsync();
+            }
+            catch (Exception)
+            {
+                return Error.Failure(
+                    "فشل حفظ البيانات",
+                    "حدث خطأ أثناء حفظ التعديلات"
+                );
+            }
+            return  Result.Ok();
+           
         }
-        public async Task<bool> DeleteAsync(string id)
+
+
+        public async Task<Result<bool>> DeleteAsync(string id)
         {
+            if (string.IsNullOrWhiteSpace(id))
+                return Error.Validation(
+                    "معرف غير صالح",
+                    "يجب إدخال معرف صالح للفني"
+                );
+
             var technician = await _unitOfWork.TechnicalRepository.GetByIdAsync(id);
 
             if (technician == null)
-                return false;
+                return Error.NotFound(
+                    "الفني غير موجود",
+                    $"لا يوجد فني بالمعرف {id}"
+                );
 
             _unitOfWork.TechnicalRepository.Remove(technician);
 
-            var result = await _unitOfWork.SaveAsync();
+            try
+            {
+                var result = await _unitOfWork.SaveAsync();
 
-            return result > 0;
+                if (result == 0)
+                    return Error.Failure(
+                        "فشل الحذف",
+                        "لم يتم حذف الفني"
+                    );
+
+                return true;
+            }
+            catch (Exception)
+            {
+                return Error.Failure(
+                    "خطأ في قاعدة البيانات",
+                    "حدث خطأ أثناء حذف الفني"
+                );
+            }
         }
-        public async Task<bool> UploadDocumentsAsync(string technicianId, UploadDocumentsDto documents)
+
+
+        public async Task<Result<bool>> UploadDocumentsAsync(string technicianId, UploadDocumentsDto documents)
         {
-            if (documents == null)
-                throw new ArgumentNullException(nameof(documents));
+            // 1. Validate input
+            if (string.IsNullOrWhiteSpace(technicianId) || documents == null)
+                return Error.Validation("بيانات غير صالحة", "يجب تقديم معرف الفني والوثائق");
 
             if (documents.FaceImage == null || documents.BackImage == null)
-                throw new ArgumentException("Both images are required");
+                return Error.Validation("ملفات غير مكتملة", "يجب رفع صورة الوجه وصورة الخلف");
 
+            // 2. Check technician
             var technician = await _unitOfWork.TechnicalRepository.GetByIdAsync(technicianId);
 
             if (technician == null)
-                return false;
+                return Error.NotFound("الفني غير موجود", $"لا يوجد فني بالمعرف {technicianId}");
 
-            // Upload new files
-            /*var facePath = await _fileService.UploadFile(documents.FaceImage);
-            var backPath = await _fileService.UploadFile(documents.BackImage);*/
+            // 3. Upload files
+            var saveReFace = await _fileService.SaveFileAsync(documents.FaceImage, "TechnicianDocuments");
+            if (!saveReFace.IsSuccess)
+                return Error.Failure("فشل عمليه الحفظ", "حدث غطأ في الملفات المرسلة  يرجو الرفع مره اخري");
 
-            // Delete old files
-            if (technician.Document?.FaceImageUrl != null)
-                await _fileService.DeleteFile(technician.Document.FaceImageUrl);
 
-            if (technician.Document?.BackImageUrl != null)
-                await _fileService.DeleteFile(technician.Document.BackImageUrl);
+            var saveReBack = await _fileService.SaveFileAsync(documents.BackImage, "TechnicianDocuments");
+            if (!saveReBack.IsSuccess)
+                 return Error.Failure("فشل عمليه الحفظ", "حدث غطأ في الملفات المرسلة  يرجو الرفع مره اخري");
+            ;
 
-            // Create document if not exists
-            if (technician.Document == null)
+            // 4. Create document
+            var document = new TechnicianDocument
             {
-                technician.Document = new TechnicianDocument
-                {
-                    TechnicianId = technician.Id
-                };
+                FaceImageUrl = saveReFace.Value,
+                BackImageUrl = saveReBack.Value,
+                TechnicianId = technicianId
+            };
+
+            await _unitOfWork.DocumentRepository.AddAsync(document);
+
+            // 5. Save changes
+            try
+            {
+                await _unitOfWork.SaveAsync();
             }
-
-           /* technician.Document.FaceImageUrl = facePath;
-            technician.Document.BackImageUrl = backPath;*/
-            technician.Document.UploadedAt = DateTime.UtcNow;
-
-            await _unitOfWork.SaveAsync();
+            catch
+            {
+                return Error.Failure("فشل حفظ البيانات", "حدث خطأ أثناء حفظ الوثائق");
+            }
 
             return true;
         }
-        public async Task<bool> ToggleAvailabilityStatusAsync(string technicianId, bool isAvailable)
+
+
+        public async Task<Result<bool>> ToggleAvailabilityStatusAsync(string technicianId, bool isAvailable)
         {
+            if (string.IsNullOrWhiteSpace(technicianId))
+                return Error.Validation(
+                    "معرف غير صالح",
+                    "يجب إدخال معرف صالح للفني"
+                );
+
             var technician = await _unitOfWork.TechnicalRepository.GetByIdAsync(technicianId);
 
             if (technician == null)
-                return false;
+                return Error.NotFound(
+                    "الفني غير موجود",
+                    $"لا يوجد فني بالمعرف {technicianId}"
+                );
+
+            if (technician.AvailabilityStatus == isAvailable)
+                return Error.Validation(
+                    "لا يوجد تغيير",
+                    "حالة التوفر بالفعل كما هي"
+                );
 
             technician.AvailabilityStatus = isAvailable;
 
-            await _unitOfWork.SaveAsync();
+            try
+            {
+                var result = await _unitOfWork.SaveAsync();
+
+                if (result == 0)
+                    return Error.Failure(
+                        "فشل التحديث",
+                        "لم يتم تحديث حالة التوفر"
+                    );
+            }
+            catch
+            {
+                return Error.Failure(
+                    "خطأ في قاعدة البيانات",
+                    "حدث خطأ أثناء تحديث حالة التوفر"
+                );
+            }
 
             return true;
         }

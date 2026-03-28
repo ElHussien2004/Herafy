@@ -10,6 +10,7 @@ using Persistence.Repositories;
 using Service;
 using Service.MappingProfiles;
 using ServiceAbstraction;
+using StackExchange.Redis;
 
 namespace Herafy.Api
 {
@@ -37,7 +38,12 @@ namespace Herafy.Api
             builder.Services.AddScoped<IFileService, FileService>();
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddAutoMapper(a => a.AddProfile(new TechnicianProfile()));
-      
+
+            builder.Services.AddSingleton<IConnectionMultiplexer>((_) =>
+            {
+                return ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("RedisConnectionString"));
+            }
+            );
             var app = builder.Build();
             // Configure the HTTP request pipeline.
             // Middleware

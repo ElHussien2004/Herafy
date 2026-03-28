@@ -34,8 +34,8 @@ namespace Service.MappingProfiles
                     ));
 
             CreateMap< AddTechnicianDto,Technician>();
-            CreateMap<Technician, UpdateTechnicianDto>().ReverseMap();
-            CreateMap<Technician, UploadDocumentsDto>().ReverseMap();
+       
+          
         }
     }
 }
