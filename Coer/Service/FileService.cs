@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using ServiceAbstraction;
+using Shared.CommonResult;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,30 +11,32 @@ namespace Service
 {
     public class FileService : IFileService
     {
-        private readonly string _uploadFolder =
-            Path.Combine("wwwroot", "uploads", "technician-documents");
-        public async Task<string> UploadFile(IFormFile file)
+        private readonly string[] _allowedExtensions = { ".jpg", ".png" };
+        public async Task<Result<string>> SaveFileAsync(IFormFile file, string relativePath)
         {
             if (file == null || file.Length == 0)
-                throw new Exception("Invalid file");
-            //  file type (image)
-            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
+                return Error.Validation("ملف غير صالح", "الملف فارغ");
+
             var extension = Path.GetExtension(file.FileName).ToLower();
 
-            if (!allowedExtensions.Contains(extension))
-                throw new Exception("Invalid file type");
+            if (!_allowedExtensions.Contains(extension))
+                return Error.Validation("نوع الملف غير مدعوم", "يرجى رفع صورة بصيغة jpg أو png");
 
-            if (!Directory.Exists(_uploadFolder))
-                Directory.CreateDirectory(_uploadFolder);
+            var rootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+            var fullPath = Path.Combine(rootPath, relativePath);
 
-            var fileName = Guid.NewGuid().ToString() + extension;
+            if (!Directory.Exists(fullPath))
+                Directory.CreateDirectory(fullPath);
 
-            var fullPath = Path.Combine(_uploadFolder, fileName);
+            var fileName = $"{Guid.NewGuid()}{extension}";
+            var filePath = Path.Combine(fullPath, fileName);
 
-            using var stream = new FileStream(fullPath, FileMode.Create);
+            using var stream = new FileStream(filePath,FileMode.Create);
             await file.CopyToAsync(stream);
 
-            return $"/uploads/technician-documents/{fileName}";
+            var relative = Path.Combine(relativePath, fileName).Replace("\\", "/");
+
+            return Result<string>.Ok(relative);
         }
         public Task<bool> DeleteFile(string filePath)
         {

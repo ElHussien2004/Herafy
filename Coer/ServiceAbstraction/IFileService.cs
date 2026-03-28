@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Shared.CommonResult;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace ServiceAbstraction
 {
     public interface IFileService
     {
-        Task<string> UploadFile(IFormFile file);
+        Task<Result<string>> SaveFileAsync(IFormFile file, string relativePath);
         Task<bool> DeleteFile(string filePath);
     }
 }

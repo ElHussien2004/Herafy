@@ -1,7 +1,10 @@
 ﻿using AutoMapper;
 using Domain.Contracts;
 using Domain.Entities.UsersEntity;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens.Experimental;
 using ServiceAbstraction;
+using Shared.CommonResult;
 using Shared.DTOs.TechnicianDTOS;
 using System;
 using System.Collections.Generic;
@@ -11,40 +14,92 @@ using System.Threading.Tasks;
 
 namespace Service
 {
-    public class TechnicianService(IMapper _mapper, IUnitOfWork _unitOfWork, IFileService _fileService) : ITechnicianService
+    public class TechnicianService(IMapper _mapper, IUnitOfWork _unitOfWork, IFileService _fileService,UserManager<ApplicationUser> userManager) : ITechnicianService
     {
-        public async Task<IEnumerable<TechnicianDto>> GetAllAsync()
+        public async Task<Result<IEnumerable<TechnicianDto>>> GetAllAsync()
         {
             var technicians = await _unitOfWork.TechnicalRepository.GetAllAsync();
 
-            return _mapper.Map<IEnumerable<TechnicianDto>>(technicians);
+            if (technicians == null)
+                //return Result<IEnumerable<TechnicianDto>>.Fail(Error.NotFound());
+                return Error.NotFound("لا توجد بيانات", "لا يوجد فنيين متاحين حالياً");
+
+            return Result < IEnumerable < TechnicianDto >>.Ok( _mapper.Map<IEnumerable<TechnicianDto>>(technicians));
         }
 
-        public async Task<TechnicianDetailsDto?> GetByIdAsync(string id)
+        public async Task<Result<TechnicialDetailsDto>> GetByIdAsync(string id)
         {
             var technician = await _unitOfWork.TechnicalRepository.GetByIdAsync(id);
 
             if (technician == null)
-                return null;
+                return Error.NotFound("الفني غير موجود " ,$"الفني {id} غير موجود  ");
+               //return Result<TechnicianDetailsDto>.Fail(Error.NotFound("الفني غير موجود ", $"الفني {id} غير موجود  "));
+            
+             return _mapper.Map<TechnicialDetailsDto>(technician);
 
-            return _mapper.Map<TechnicianDetailsDto>(technician);
+            // return Result<TechnicianDetailsDto>.Ok (_mapper.Map<TechnicianDetailsDto>(technician));
         }
 
-        public async Task AddAsync(AddTechnicianDto technicianDto)
+        public async Task<Result> AddAsync(AddTechnicianDto technicianDto)
         {
+            // 1. Validate input
+            if (technicianDto == null)
+                return Error.Validation("بيانات غير صالحة", "البيانات المرسلة غير صحيحة");
 
+            // 2. Get user
+            var user = await userManager.FindByIdAsync(technicianDto.UserId);
+
+            if (user == null)
+                return Error.NotFound(
+                    "المستخدم غير موجود",
+                    $"لا يوجد مستخدم بالمعرف {technicianDto.UserId}"
+                );
+
+            // 3. Check if already technician
+            var existing = await _unitOfWork.TechnicalRepository
+                .GetByIdAsync(technicianDto.UserId);
+
+            if (existing != null)
+                return Error.Validation(
+                    "موجود بالفعل",
+                    "هذا المستخدم مسجل بالفعل كفني"
+                );
+
+            // 4. Upload image
+            var uploadResult = await _fileService.SaveFileAsync(
+                technicianDto.Image,
+                "ProfileImage"
+            );
+
+            if (!uploadResult.IsSuccess)
+                return uploadResult;
+
+            // 5. Update user
+            user.FullName = technicianDto.FullName;
+            user.ProfileImageURL = uploadResult.Value;
+
+            var updateResult = await userManager.UpdateAsync(user);
+
+            if (!updateResult.Succeeded)
+                return  Error.Failure(
+                    "فشل تحديث المستخدم",
+                    "حدث خطأ أثناء تحديث بيانات المستخدم"
+                );
+
+            // 6. Create technician
             var technician = _mapper.Map<Technician>(technicianDto);
 
             await _unitOfWork.TechnicalRepository.AddAsync(technician);
 
+            // 7. Save changes
             await _unitOfWork.SaveAsync();
 
-            //get user by id 
-            // assign fullname ,pictureurl ,
-            //store photo in wwroot return url
-            //create technicain 
-
+            return Result.Ok();
         }
+
+
+
+
 
         public async Task UpdateAsync(UpdateTechnicianDto technicianDto)
         {
@@ -84,8 +139,8 @@ namespace Service
                 return false;
 
             // Upload new files
-            var facePath = await _fileService.UploadFile(documents.FaceImage);
-            var backPath = await _fileService.UploadFile(documents.BackImage);
+            /*var facePath = await _fileService.UploadFile(documents.FaceImage);
+            var backPath = await _fileService.UploadFile(documents.BackImage);*/
 
             // Delete old files
             if (technician.Document?.FaceImageUrl != null)
@@ -103,8 +158,8 @@ namespace Service
                 };
             }
 
-            technician.Document.FaceImageUrl = facePath;
-            technician.Document.BackImageUrl = backPath;
+           /* technician.Document.FaceImageUrl = facePath;
+            technician.Document.BackImageUrl = backPath;*/
             technician.Document.UploadedAt = DateTime.UtcNow;
 
             await _unitOfWork.SaveAsync();

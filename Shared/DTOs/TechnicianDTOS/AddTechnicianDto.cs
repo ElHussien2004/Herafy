@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,6 +13,7 @@ namespace Shared.DTOs.TechnicianDTOS
         public string FullName { get; set; }
         public string City { get; set; }
 
+        public IFormFile Image { get; set; }
         public string Government { get; set; }
         public int ServiceCategoryId { get; set; }
 
