@@ -15,14 +15,23 @@ namespace Service.MappingProfiles
         public TechnicianProfile()
         {
             CreateMap<Technician, TechnicianDto>()
-            .ForMember(des => des.ServiceCategory, sr => sr.MapFrom(t => t.ServiceCategory.Name))
-            .ForMember(des=>des.Fullname,op=>op.MapFrom(sr=>sr.User.FullName))
-            .ForMember(des=>des.ProfileImageURL,op=>op.MapFrom(sr=>sr.User.ProfileImageURL));
+                .ForMember(d => d.ServiceCategory,
+                    opt => opt.MapFrom(s => s.ServiceCategory != null ? s.ServiceCategory.Name : null))
+                .ForMember(d => d.Fullname,
+                    opt => opt.MapFrom(s => s.User != null ? s.User.FullName : null))
+                .ForMember(d => d.ProfileImageURL,
+                    opt => opt.MapFrom<URLResolver<Technician, TechnicianDto>, string?>(
+                        s => s.User != null ? s.User.ProfileImageURL : null));
 
             CreateMap<Technician, TechnicialDetailsDto>()
-               .ForMember(des => des.ServiceCategory, sr => sr.MapFrom(t => t.ServiceCategory.Name))
-              .ForMember(des => des.Fullname, op => op.MapFrom(sr => sr.User.FullName))
-             .ForMember(des => des.ProfileImageURL, op => op.MapFrom(sr => sr.User.ProfileImageURL));
+                .ForMember(d => d.ServiceCategory,
+                    opt => opt.MapFrom(s => s.ServiceCategory != null ? s.ServiceCategory.Name : null))
+                .ForMember(d => d.Fullname,
+                    opt => opt.MapFrom(s => s.User != null ? s.User.FullName : null))
+                .ForMember(d => d.ProfileImageURL,
+                    opt => opt.MapFrom<URLResolver<Technician, TechnicialDetailsDto>, string?>(
+                        s => s.User != null ? s.User.ProfileImageURL : null
+                    ));
 
             CreateMap< AddTechnicianDto,Technician>();
             CreateMap<Technician, UpdateTechnicianDto>().ReverseMap();

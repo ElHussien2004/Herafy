@@ -10,7 +10,7 @@ namespace Shared.DTOs.TechnicianDTOS
     {
         public string UserId { get; set; }
         public string Fullname { get; set; }
-        public string ProfileImageURL { get; set; }
+        public string? ProfileImageURL { get; set; }
         public string ServiceCategory { get; set; }
         public int ExperienceYears { get; set; }
         public double RatingAvg { get; set; }
