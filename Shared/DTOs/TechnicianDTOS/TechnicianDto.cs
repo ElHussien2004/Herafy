@@ -16,5 +16,8 @@ namespace Shared.DTOs.TechnicianDTOS
         public double RatingAvg { get; set; }
         public bool AvailabilityStatus { get; set; }//هو متاح للطلب ولا لا 
         public decimal InspectedPrice { get; set; }
+        public double Latitude { get; set; }
+
+        public double Longitude { get; set; }
     }
 }

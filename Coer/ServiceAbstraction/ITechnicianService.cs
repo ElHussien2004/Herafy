@@ -1,4 +1,5 @@
 ﻿using Domain.Entities.UsersEntity;
+using Shared;
 using Shared.CommonResult;
 using Shared.DTOs.TechnicianDTOS;
 using System;
@@ -11,7 +12,7 @@ namespace ServiceAbstraction
 {
     public interface ITechnicianService
     {
-        Task<Result<IEnumerable<TechnicianDto>>> GetAllAsync();
+        Task<Result<IEnumerable<TechnicianDto>>> GetAllAsync(TechnicianQuery ParamsQuery);
         Task<Result<TechnicialDetailsDto>> GetByIdAsync(string id);
         Task<Result> AddAsync(AddTechnicianDto technician);
         Task<Result> UpdateAsync(UpdateTechnicianDto technician);

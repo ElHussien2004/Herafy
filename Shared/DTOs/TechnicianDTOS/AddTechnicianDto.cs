@@ -12,7 +12,9 @@ namespace Shared.DTOs.TechnicianDTOS
         public string UserId { get; set; }
         public string FullName { get; set; }
         public string City { get; set; }
+        public double Latitude { get; set; }
 
+        public double Longitude { get; set; }
         public IFormFile Image { get; set; }
         public string Government { get; set; }
         public int ServiceCategoryId { get; set; }

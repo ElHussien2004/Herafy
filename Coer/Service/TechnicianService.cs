@@ -3,7 +3,9 @@ using Domain.Contracts;
 using Domain.Entities.UsersEntity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens.Experimental;
+using Service.Specifications;
 using ServiceAbstraction;
+using Shared;
 using Shared.CommonResult;
 using Shared.DTOs.TechnicianDTOS;
 using System;
@@ -16,20 +18,23 @@ namespace Service
 {
     public class TechnicianService(IMapper _mapper, IUnitOfWork _unitOfWork, IFileService _fileService,UserManager<ApplicationUser> userManager) : ITechnicianService
     {
-        public async Task<Result<IEnumerable<TechnicianDto>>> GetAllAsync()
+        public async Task<Result<IEnumerable<TechnicianDto>>> GetAllAsync(TechnicianQuery query)
         {
-            var technicians = await _unitOfWork.TechnicalRepository.GetAllAsync();
+            var sp = new TechnicianSpecifications(query);
+
+            var technicians = await _unitOfWork.TechnicalRepository.GetAllAsync(sp);
 
             if (technicians == null)
                 //return Result<IEnumerable<TechnicianDto>>.Fail(Error.NotFound());
                 return Error.NotFound("لا توجد بيانات", "لا يوجد فنيين متاحين حالياً");
 
-            return Result < IEnumerable < TechnicianDto >>.Ok( _mapper.Map<IEnumerable<TechnicianDto>>(technicians));
+            return Result<IEnumerable<TechnicianDto>>.Ok(_mapper.Map<IEnumerable<TechnicianDto>>(technicians));
         }
 
         public async Task<Result<TechnicialDetailsDto>> GetByIdAsync(string id)
         {
-            var technician = await _unitOfWork.TechnicalRepository.GetByIdAsync(id);
+            var sp=new TechnicianSpecifications(id);
+            var technician = await _unitOfWork.TechnicalRepository.GetByIdAsync(sp);
 
             if (technician == null)
                 return Error.NotFound("الفني غير موجود " ,$"الفني {id} غير موجود  ");
@@ -54,10 +59,11 @@ namespace Service
                     "المستخدم غير موجود",
                     $"لا يوجد مستخدم بالمعرف {technicianDto.UserId}"
                 );
+            var sp = new TechnicianSpecifications(technicianDto.UserId);
 
             // 3. Check if already technician
             var existing = await _unitOfWork.TechnicalRepository
-                .GetByIdAsync(technicianDto.UserId);
+                .GetByIdAsync(sp);
 
             if (existing != null)
                 return Error.Validation(
@@ -123,9 +129,9 @@ namespace Service
                     "فشل تحديث المستخدم",
                     string.Join(", ", updateResult.Errors.Select(e => e.Description))
                 );
-
+            var sp = new TechnicianSpecifications(technicianDto.Id);
             // get tec 
-            var technician = await _unitOfWork.TechnicalRepository.GetByIdAsync(technicianDto.Id);
+            var technician = await _unitOfWork.TechnicalRepository.GetByIdAsync(sp);
             if (technician == null)
                 return Error.NotFound("الفني غير موجود", $"لا يوجد فني بالمعرف {technicianDto.Id}");
 
@@ -158,8 +164,8 @@ namespace Service
                     "معرف غير صالح",
                     "يجب إدخال معرف صالح للفني"
                 );
-
-            var technician = await _unitOfWork.TechnicalRepository.GetByIdAsync(id);
+            var sp = new TechnicianSpecifications(id);
+            var technician = await _unitOfWork.TechnicalRepository.GetByIdAsync(sp);
 
             if (technician == null)
                 return Error.NotFound(
@@ -199,9 +205,9 @@ namespace Service
 
             if (documents.FaceImage == null || documents.BackImage == null)
                 return Error.Validation("ملفات غير مكتملة", "يجب رفع صورة الوجه وصورة الخلف");
-
+            var sp = new TechnicianSpecifications(technicianId);
             // 2. Check technician
-            var technician = await _unitOfWork.TechnicalRepository.GetByIdAsync(technicianId);
+            var technician = await _unitOfWork.TechnicalRepository.GetByIdAsync(sp);
 
             if (technician == null)
                 return Error.NotFound("الفني غير موجود", $"لا يوجد فني بالمعرف {technicianId}");
@@ -248,8 +254,8 @@ namespace Service
                     "معرف غير صالح",
                     "يجب إدخال معرف صالح للفني"
                 );
-
-            var technician = await _unitOfWork.TechnicalRepository.GetByIdAsync(technicianId);
+            var sp = new TechnicianSpecifications(technicianId);
+            var technician = await _unitOfWork.TechnicalRepository.GetByIdAsync(sp);
 
             if (technician == null)
                 return Error.NotFound(
@@ -286,5 +292,6 @@ namespace Service
             return true;
         }
 
+       
     }
 }

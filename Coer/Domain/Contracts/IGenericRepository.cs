@@ -11,8 +11,8 @@ namespace Domain.Contracts
 
     public interface IGenericRepository<TEntity, TKey> 
     {
-        Task<IEnumerable<TEntity>> GetAllAsync();
-        Task<TEntity?> GetByIdAsync(TKey id);
+        Task<IEnumerable<TEntity>> GetAllAsync(ISpecifications<TEntity> specifications);
+        Task<TEntity?> GetByIdAsync(ISpecifications<TEntity> specifications);       
         Task AddAsync(TEntity entity);
 
         void Update(TEntity entity);
