@@ -16,22 +16,23 @@ using System.Threading.Tasks;
 
 namespace Service
 {
-    public class TechnicianService(IMapper _mapper, IUnitOfWork _unitOfWork, IFileService _fileService,UserManager<ApplicationUser> userManager) : ITechnicianService
+    public class TechnicianService(IMapper _mapper, IUnitOfWork _unitOfWork, IFileService _fileService,UserManager<ApplicationUser> userManager,RoleManager<IdentityRole> roleManager) : ITechnicianService
     {
-        public async Task<Result<IEnumerable<TechnicianDto>>> GetAllAsync(TechnicianQuery query)
+        public async Task<Result<IEnumerable<TechnicialDto>>> GetAllAsync(TechnicianQuery query)
         {
             var sp = new TechnicianSpecifications(query);
 
             var technicians = await _unitOfWork.TechnicalRepository.GetAllAsync(sp);
+            if (technicians == null || !technicians.Any())
+            {
+                return Result<IEnumerable<TechnicialDto>>.Ok(Enumerable.Empty<TechnicialDto>());
+            }
+            var mappedData = _mapper.Map<IEnumerable<TechnicialDto>>(technicians);
 
-            if (technicians == null)
-                //return Result<IEnumerable<TechnicianDto>>.Fail(Error.NotFound());
-                return Error.NotFound("لا توجد بيانات", "لا يوجد فنيين متاحين حالياً");
-
-            return Result<IEnumerable<TechnicianDto>>.Ok(_mapper.Map<IEnumerable<TechnicianDto>>(technicians));
+            return Result<IEnumerable<TechnicialDto>>.Ok(mappedData);
         }
 
-        public async Task<Result<TechnicialDetailsDto>> GetByIdAsync(string id)
+        public async Task<Result<TechniciaDetailsDto>> GetByIdAsync(string id)
         {
             var sp=new TechnicianSpecifications(id);
             var technician = await _unitOfWork.TechnicalRepository.GetByIdAsync(sp);
@@ -40,28 +41,35 @@ namespace Service
                 return Error.NotFound("الفني غير موجود " ,$"الفني {id} غير موجود  ");
                //return Result<TechnicianDetailsDto>.Fail(Error.NotFound("الفني غير موجود ", $"الفني {id} غير موجود  "));
             
-             return _mapper.Map<TechnicialDetailsDto>(technician);
+             return _mapper.Map<TechniciaDetailsDto>(technician);
 
             // return Result<TechnicianDetailsDto>.Ok (_mapper.Map<TechnicianDetailsDto>(technician));
         }
 
-        public async Task<Result> AddAsync(AddTechnicianDto technicianDto)
+        public async Task<Result> AddAsync(string id ,AddTechnicianDto technicianDto)
         {
             // 1. Validate input
             if (technicianDto == null)
                 return Error.Validation("بيانات غير صالحة", "البيانات المرسلة غير صحيحة");
 
             // 2. Get user
-            var user = await userManager.FindByIdAsync(technicianDto.UserId);
+            var user = await userManager.FindByIdAsync(id);
 
             if (user == null)
                 return Error.NotFound(
                     "المستخدم غير موجود",
-                    $"لا يوجد مستخدم بالمعرف {technicianDto.UserId}"
+                    $"لا يوجد مستخدم بالمعرف {id}"
                 );
-            var sp = new TechnicianSpecifications(technicianDto.UserId);
+            //Add Role
+            if (!await roleManager.RoleExistsAsync("Technician"))
+            {
+                await roleManager.CreateAsync(new IdentityRole("Technician"));
+            }
 
+            // Add Role to User
+            await userManager.AddToRoleAsync(user, "Technician");
             // 3. Check if already technician
+            var sp = new TechnicianSpecifications(id);
             var existing = await _unitOfWork.TechnicalRepository
                 .GetByIdAsync(sp);
 
@@ -105,15 +113,15 @@ namespace Service
 
 
 
-        public async Task<Result> UpdateAsync(UpdateTechnicianDto technicianDto)
+        public async Task<Result> UpdateAsync(string id,UpdateTechnicianDto technicianDto)
         {
 
             if (technicianDto == null)
                 return Error.Validation("بيانات غير صالحة", "البيانات المرسلة فارغة");
             //GET USER update fullname ,image 
-            var user = await userManager.FindByIdAsync(technicianDto.Id);
+            var user = await userManager.FindByIdAsync(id);
             if (user == null)
-                   return Error.NotFound("المستخدم غير موجود", $"لا يوجد مستخدم بالمعرف {technicianDto.Id}");
+                   return Error.NotFound("المستخدم غير موجود", $"لا يوجد مستخدم بالمعرف {id}");
             user.FullName=  technicianDto.FullName;
             if (technicianDto.ImageUrl != null && technicianDto.ImageUrl.Length > 0)
             {
@@ -129,11 +137,11 @@ namespace Service
                     "فشل تحديث المستخدم",
                     string.Join(", ", updateResult.Errors.Select(e => e.Description))
                 );
-            var sp = new TechnicianSpecifications(technicianDto.Id);
+            var sp = new TechnicianSpecifications(id);
             // get tec 
             var technician = await _unitOfWork.TechnicalRepository.GetByIdAsync(sp);
             if (technician == null)
-                return Error.NotFound("الفني غير موجود", $"لا يوجد فني بالمعرف {technicianDto.Id}");
+                return Error.NotFound("الفني غير موجود", $"لا يوجد فني بالمعرف {id}");
 
             technician.Bio  = technicianDto.Bio;
             technician.ExperienceYears = technicianDto.ExperienceYears;
@@ -172,6 +180,8 @@ namespace Service
                     "الفني غير موجود",
                     $"لا يوجد فني بالمعرف {id}"
                 );
+            var user = await userManager.FindByIdAsync(id);
+            await userManager.DeleteAsync(user);
 
             _unitOfWork.TechnicalRepository.Remove(technician);
 
@@ -292,6 +302,42 @@ namespace Service
             return true;
         }
 
-       
+        public async Task<Result<bool>> ChangeIsActive(string id, bool state)
+        {
+            //get client 
+            if (id == null)
+                return Result<bool>.Fail(Error.Validation("بيانات غير صالحة", "يجب إدخال بيانات الفني"));
+
+            var sp = new TechnicianSpecifications(id);
+            var tec = await _unitOfWork.TechnicalRepository.GetByIdAsync(sp);
+
+            if (tec == null)
+                return Error.NotFound("الفني غير موجود", $"لا يوجد الفني بالمعرف {id}");
+            // is active false 
+
+            tec.IsActive = state;
+            // update 
+            _unitOfWork.TechnicalRepository.Update(tec);
+            //save change
+            try
+            {
+                await _unitOfWork.SaveAsync();
+            }
+            catch (Exception)
+            {
+                return Error.Failure(
+                    "فشل حفظ البيانات",
+                    "حدث خطأ أثناء حفظ التعديلات"
+                );
+            }
+            //return Ok.Success();
+            return Result<bool>.Ok(true);
+        }
+
+        public async Task<Result<int>> CountAsync()
+        {
+            var count = await _unitOfWork.TechnicalRepository.CountAsync();
+            return Result<int>.Ok(count);
+        }
     }
 }

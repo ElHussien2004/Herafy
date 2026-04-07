@@ -31,7 +31,7 @@ namespace Shared.CommonResult
         }
         public static Error NotFound(string code = "General .NotFound", string description = "العنصر المطلوب غير موجود")
         {
-            return new Error(code, description, ErrorType.Validation);
+            return new Error(code, description, ErrorType.NotFound);
         }
 
         public static Error Unauthorized(string code = "General .Unauthorized", string description = "يجب تسجيل الدخول أولاً")
@@ -42,9 +42,9 @@ namespace Shared.CommonResult
         {
             return new Error(code, description, ErrorType.Forbidden);
         }
-        public static Error InvalidCrendentails(string code = "General .InvalidCrendentails", string description = "بيانات تسجيل الدخول غير صحيحة")
+        public static Error InvalidCrendentials(string code = "General .InvalidCrendentails", string description = "بيانات تسجيل الدخول غير صحيحة")
         {
-            return new Error(code, description, ErrorType.InvalidCrendentails);
+            return new Error(code, description, ErrorType.InvalidCrendentials);
         }
     }
 }

@@ -6,18 +6,19 @@ using System.Threading.Tasks;
 
 namespace Shared.DTOs.TechnicianDTOS
 {
-    public class TechnicianDto
+    public class TechnicialDto
     {
-        public string UserId { get; set; }
+       
         public string Fullname { get; set; }
         public string? ProfileImageURL { get; set; }
         public string ServiceCategory { get; set; }
         public int ExperienceYears { get; set; }
-        public double RatingAvg { get; set; }
+        public string Bio { get; set; }
         public bool AvailabilityStatus { get; set; }//هو متاح للطلب ولا لا 
-        public decimal InspectedPrice { get; set; }
-        public double Latitude { get; set; }
+        public bool IsActive { get; set; }
+        public double RatingAvg { get; set; }
 
-        public double Longitude { get; set; }
+        public int CompletedJobs { get; set; }
+
     }
 }

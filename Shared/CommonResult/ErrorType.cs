@@ -13,7 +13,7 @@ namespace Shared.CommonResult
         NotFound= 2,
         Unauthorized= 3,
         Forbidden= 4,
-        InvalidCrendentails= 5,
+        InvalidCrendentials= 5,
 
     }
 }

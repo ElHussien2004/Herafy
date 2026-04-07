@@ -38,7 +38,7 @@ namespace Herafy.Api
             builder.Services.AddScoped<IFileService, FileService>();
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddAutoMapper(a => a.AddProfile(new TechnicianProfile()));
-
+            builder.Services.AddScoped<IServiceManager, ServiceManager>();
             builder.Services.AddSingleton<IConnectionMultiplexer>((_) =>
             {
                 return ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("RedisConnectionString"));

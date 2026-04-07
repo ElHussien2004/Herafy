@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Shared.CommonResult;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,6 @@ namespace ServiceAbstraction
 {
     public interface ISMSService
     {
-        public Task SendAsync(string to, string message);
+        public Task<Result> SendAsync(string to, string message);
     }
 }

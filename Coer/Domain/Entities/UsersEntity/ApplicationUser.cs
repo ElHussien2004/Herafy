@@ -11,9 +11,9 @@ namespace Domain.Entities.UsersEntity
 {
     public class ApplicationUser : IdentityUser
     {
-        public string FullName { get; set; }
+        public string? FullName { get; set; }
 
-        public string ProfileImageURL { get; set; }
+        public string? ProfileImageURL { get; set; }
 
         public DateTime CreatedAt { get; set; }
 

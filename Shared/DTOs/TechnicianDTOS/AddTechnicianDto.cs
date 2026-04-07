@@ -9,7 +9,6 @@ namespace Shared.DTOs.TechnicianDTOS
 {
     public class AddTechnicianDto
     {
-        public string UserId { get; set; }
         public string FullName { get; set; }
         public string City { get; set; }
         public double Latitude { get; set; }

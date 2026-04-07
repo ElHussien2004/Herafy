@@ -14,5 +14,6 @@ namespace ServiceAbstraction
          public IFileService FileService { get; }
          public ITechnicianService TechnicianService { get; }
          public IAuthService AuthService { get; }
+        public IClientService ClientService { get; }
     }
 }
