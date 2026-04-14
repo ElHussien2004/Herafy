@@ -13,7 +13,7 @@ namespace Persistence.Data.Configrations
     {
         public void Configure(EntityTypeBuilder<Client> builder)
         {
-            builder.HasKey(x => x.UserId);
+            builder.HasKey(x => x.Id);
 
             builder.Property(x => x.City)
                    .IsRequired()
@@ -26,7 +26,7 @@ namespace Persistence.Data.Configrations
             builder.Property(x => x.IsActive)
                    .HasDefaultValue(false);
 
-            builder.HasIndex(x => x.UserId)
+            builder.HasIndex(x => x.Id)
                    .IsUnique(); // One To One
         }
     }

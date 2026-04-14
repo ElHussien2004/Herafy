@@ -25,13 +25,13 @@ namespace Persistence.Data.Configrations
             // One To One -> Client
             builder.HasOne(x => x.Client)
                    .WithOne(x => x.User)
-                   .HasForeignKey<Client>(x => x.UserId)
+                   .HasForeignKey<Client>(x => x.Id)
                    .OnDelete(DeleteBehavior.Restrict);
 
             // One To One -> Technician
             builder.HasOne(x => x.Technician)
                    .WithOne(x => x.User)
-                   .HasForeignKey<Technician>(x => x.UserId)
+                   .HasForeignKey<Technician>(x => x.Id)
                    .OnDelete(DeleteBehavior.Restrict);
         }
     }

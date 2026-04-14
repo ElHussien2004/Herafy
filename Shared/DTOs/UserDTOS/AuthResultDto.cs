@@ -16,5 +16,6 @@ namespace Shared.DTOs.UserDTOS
         public DateTime ExpiresOn { get; set; }
 
         public string PhoneNumber { get; set; }
+        public bool IsNew { get; set; }
     }
 }

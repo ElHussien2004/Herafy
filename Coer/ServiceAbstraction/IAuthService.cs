@@ -1,4 +1,5 @@
 ﻿using Shared.CommonResult;
+using Shared.DTOs;
 using Shared.DTOs.UserDTOS;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ namespace ServiceAbstraction
 {
     public interface IAuthService
     {
-        Task<Result> SendOtpAsync(string phoneNumber);
-        Task<Result<AuthResultDto>> VerifyOtpAsync(string phoneNumber, string otpCode);
+        Task<Result> SendOtpAsync(SendOtpDto dto);
+        Task<Result<AuthResultDto>> VerifyOtpAsync(VerifyOtpDto dto);
     }
 }

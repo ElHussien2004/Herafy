@@ -40,10 +40,13 @@ namespace Service.Specifications
             }
         
         }
-        public TechnicianSpecifications(string id):base(T=>T.Id==id)
+        public TechnicianSpecifications(string id):base(T=>T.Id ==id)
         {
             AddInclude(T => T.ServiceCategory);
             AddInclude(T => T.User);
+            AddInclude(T=>T.Document);
         }
+       
+
     }
 }

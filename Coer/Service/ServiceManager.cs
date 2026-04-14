@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Domain.Contracts;
 using Domain.Entities.UsersEntity;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using ServiceAbstraction;
@@ -13,12 +14,14 @@ using System.Threading.Tasks;
 
 namespace Service
 {
-    public class ServiceManager(IConfiguration configuration,IUnitOfWork unitOfWork,IFileService fileService,IMapper mapper,IConnectionMultiplexer connection,ISMSService sMS,UserManager<ApplicationUser> userManager,
+    public class ServiceManager(IConfiguration configuration,IUnitOfWork unitOfWork,IFileService fileService,IMapper mapper
+        ,IConnectionMultiplexer connection,ISMSService sMS,UserManager<ApplicationUser> userManager,
+        IWebHostEnvironment environment,
         RoleManager<IdentityRole> roleManager) : IServiceManager
     {
         private readonly Lazy<ISMSService> _LazysmsService = new Lazy<ISMSService>(() => new SMSService(configuration));
         public ISMSService SMSService =>_LazysmsService.Value;
-        private readonly Lazy<IFileService> _LazyFileService = new Lazy<IFileService>(() => new FileService());
+        private readonly Lazy<IFileService> _LazyFileService = new Lazy<IFileService>(() => new FileService(environment));
 
         public IFileService FileService => _LazyFileService.Value;
 

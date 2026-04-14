@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using ServiceAbstraction;
 using Shared.CommonResult;
 using System;
@@ -11,44 +12,67 @@ namespace Service
 {
     public class FileService : IFileService
     {
-        private readonly string[] _allowedExtensions = { ".jpg", ".png" };
-        public async Task<Result<string>> SaveFileAsync(IFormFile file, string relativePath)
+        private readonly string[] allowedExtensions = { ".jpg", ".png",".jpeg" };
+        private readonly IWebHostEnvironment _environment;
+
+        public FileService(IWebHostEnvironment environment)
+        {
+            _environment = environment;
+        }
+
+        public async Task<Result<string>> SaveFileAsync(IFormFile file, string folderName = "Images")
         {
             if (file == null || file.Length == 0)
-                return Error.Validation("ملف غير صالح", "الملف فارغ");
+                return Error.Validation("File.Invalid", "الملف غير صالح أو تالف، يرجى محاولة رفع ملف آخر.");
 
             var extension = Path.GetExtension(file.FileName).ToLower();
-
-            if (!_allowedExtensions.Contains(extension))
-                return Error.Validation("نوع الملف غير مدعوم", "يرجى رفع صورة بصيغة jpg أو png");
-
-            var rootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
-            var fullPath = Path.Combine(rootPath, relativePath);
-
-            if (!Directory.Exists(fullPath))
-                Directory.CreateDirectory(fullPath);
+            if (!allowedExtensions.Contains(extension))
+                return Result<string>.Fail(
+                    Error.Validation("File.InvalidExtension", "عذراً، الملحقات المسموح بها فقط هي .jpg و .png")
+                );
 
             var fileName = $"{Guid.NewGuid()}{extension}";
-            var filePath = Path.Combine(fullPath, fileName);
 
-            using var stream = new FileStream(filePath,FileMode.Create);
+            var folderPath = Path.Combine(_environment.WebRootPath, folderName);
+
+            if (!Directory.Exists(folderPath))
+                Directory.CreateDirectory(folderPath);
+
+            var filePath = Path.Combine(folderPath, fileName);
+
+            using var stream = new FileStream(filePath, FileMode.Create);
             await file.CopyToAsync(stream);
 
-            var relative = Path.Combine(relativePath, fileName).Replace("\\", "/");
-
-            return Result<string>.Ok(relative);
+            // إرجاع المسار بصيغة الويب المناسبة
+            return $"/{folderName}/{fileName}";
         }
-        public Task<bool> DeleteFile(string filePath)
+
+        public Task<Result> DeleteAsync(string filePath)
         {
-            var fullPath = Path.Combine("wwwroot", filePath.TrimStart('/'));
+            if (string.IsNullOrEmpty(filePath))
+                return Task.FromResult(Result.Fail(Error.NotFound("File", "عذراً، الملف المطلوب غير موجود أو تم حذفه مسبقاً.")));
+
+            // استخدام DirectorySeparatorChar لضمان توافق الحذف مع Windows و Linux
+            var normalizedPath = filePath.TrimStart('/').Replace('/', Path.DirectorySeparatorChar);
+            var fullPath = Path.Combine(_environment.WebRootPath, normalizedPath);
 
             if (File.Exists(fullPath))
             {
                 File.Delete(fullPath);
-                return Task.FromResult(true);
             }
 
-            return Task.FromResult(false);
+            return Task.FromResult(Result.Ok());
+        }
+
+        public async Task<Result<string>> UpdateAsync(string oldFilePath, IFormFile newFile, string folderName = "Images")
+        {
+            // التحقق من وجود مسار قديم قبل محاولة حذفه
+            if (!string.IsNullOrEmpty(oldFilePath))
+            {
+                await DeleteAsync(oldFilePath);
+            }
+
+            return await SaveFileAsync(newFile, folderName);
         }
     }
 }

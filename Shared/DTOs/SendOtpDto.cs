@@ -11,5 +11,6 @@ namespace Shared.DTOs
      {
         [Required]
         public string PhoneNumber { get; set; }
+        public UserType UserType { get; set; }
     }
 }

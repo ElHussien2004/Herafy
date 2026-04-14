@@ -16,7 +16,10 @@ namespace Shared.DTOs.TechnicianDTOS
         public int ExperienceYears { get; set; }
 
         public decimal InspectedPrice { get; set; }
-        
+
+        public string City { get; set; }
+
+        public string Government { get; set; }
 
     }
 }

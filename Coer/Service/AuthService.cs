@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using ServiceAbstraction;
 using Shared.CommonResult;
+using Shared.DTOs;
 using Shared.DTOs.UserDTOS;
 using StackExchange.Redis;
 using System;
@@ -15,111 +16,161 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using Twilio.Types;
 
 namespace Service
 {
-    public class AuthService(IConnectionMultiplexer connection,ISMSService _SMS,UserManager<ApplicationUser> userManager,IConfiguration _configuration) : IAuthService
+    public class AuthService(IConnectionMultiplexer connection, ISMSService _SMS, UserManager<ApplicationUser> userManager, IConfiguration _configuration) : IAuthService
     {
         private readonly IDatabase _database = connection.GetDatabase();
-        public async Task<Result> SendOtpAsync(string phoneNumber)
+
+        public async Task<Result> SendOtpAsync(SendOtpDto dto)
         {
-            if (string.IsNullOrWhiteSpace(phoneNumber))
+            // 1. Fail-Fast Validations
+            if (string.IsNullOrWhiteSpace(dto.PhoneNumber))
                 return Error.Validation("Phone.Empty", "رقم الهاتف مطلوب");
 
-            var key = $"otp:{phoneNumber}";
+            if (dto.UserType.ToString() != "Technician" && dto.UserType.ToString() != "Client")
+                return Error.Validation("UserType.Invalid", "نوع المستخدم غير صحيح");
 
-            var existingOtp = await _database.StringGetAsync(key);
+            var otpKey = $"otp:{dto.PhoneNumber}";
+            var typeKey = $"type:{dto.PhoneNumber}";
+
+            var existingOtp = await _database.StringGetAsync(otpKey);
             if (!existingOtp.IsNullOrEmpty)
                 return Error.Failure("OTP.Exists", "تم إرسال كود بالفعل، حاول لاحقًا");
 
-            var otp = RandomNumberGenerator.GetInt32(100000, 999999).ToString();
-
-            await _database.StringSetAsync(key, otp, TimeSpan.FromMinutes(10));
-
-            var message = $"[Herafy] Your OTP code is {otp}. Valid for 10 minutes.";
-
-            var sent = await _SMS.SendAsync(phoneNumber, message);
-
-            if (!sent.IsSuccess)
+            async Task RevertRedisKeysAsync()
             {
-                await _database.KeyDeleteAsync(key);
-                return Error.Failure("SMS.Failed", "فشل في إرسال الرسالة");
-
+                await _database.KeyDeleteAsync(otpKey);
+                await _database.KeyDeleteAsync(typeKey);
             }
-            return Result.Ok();
+
+            try
+            {
+                var otp = RandomNumberGenerator.GetInt32(100000, 999999).ToString();
+
+                await _database.StringSetAsync(typeKey, dto.UserType.ToString(), TimeSpan.FromMinutes(20));
+                await _database.StringSetAsync(otpKey, otp, TimeSpan.FromMinutes(20));
+
+             
+                var message = $"[Crafty] Your OTP code is {otp}. Valid for 20 minutes.";
+                var sent = await _SMS.SendAsync(dto.PhoneNumber, message);
+
+                if (!sent.IsSuccess)
+                {
+                    await RevertRedisKeysAsync(); 
+                    return Error.Failure("SMS.Failed", "فشل في إرسال الرسالة");
+                }
+
+                return Result.Ok();
+            }
+            catch (Exception)
+            {
+                await RevertRedisKeysAsync();
+                return Error.Failure("System.Error", "حدث خطأ غير متوقع أثناء إرسال الكود");
+            }
         }
 
-        public async Task<Result<AuthResultDto>> VerifyOtpAsync(string phoneNumber, string otpCode)
+        public async Task<Result<AuthResultDto>> VerifyOtpAsync(VerifyOtpDto dto)
         {
-            if (string.IsNullOrWhiteSpace(phoneNumber) || string.IsNullOrWhiteSpace(otpCode))
+            // 1. Fail-Fast Validations (Input)
+            if (string.IsNullOrWhiteSpace(dto.PhoneNumber) || string.IsNullOrWhiteSpace(dto.OtpCode))
                 return Error.Validation("OTP.InvalidInput", "بيانات غير صحيحة");
 
-            var key = $"otp:{phoneNumber}";
+            var otpKey = $"otp:{dto.PhoneNumber}";
+            var typeKey = $"type:{dto.PhoneNumber}";
 
-            var storedOtp = await _database.StringGetAsync(key);
-
+            var storedOtp = await _database.StringGetAsync(otpKey);
             if (storedOtp.IsNullOrEmpty)
                 return Error.NotFound("OTP.Expired", "انتهت صلاحية الكود");
 
-            if (storedOtp != otpCode)
+            if (storedOtp != dto.OtpCode)
                 return Error.InvalidCrendentials("OTP.Wrong", "الكود غير صحيح");
 
-            await _database.KeyDeleteAsync(key);
+            var userType = await _database.StringGetAsync(typeKey);
 
-            var user = await userManager.Users
-                .FirstOrDefaultAsync(u => u.PhoneNumber == phoneNumber);
+            await _database.KeyDeleteAsync(otpKey);
+            await _database.KeyDeleteAsync(typeKey);
 
-            if (user == null)
+            bool isNew = false;
+            async Task RevertUserCreationAsync(ApplicationUser createdUser)
             {
-                user = new ApplicationUser
-                {
-                    UserName = phoneNumber,
-                    PhoneNumber = phoneNumber
-                };
-
-                var createResult = await userManager.CreateAsync(user);
-
-                if (!createResult.Succeeded)
-                    return Error.Failure("User.CreateFailed", "فشل إنشاء المستخدم");
+                if (createdUser != null)
+                    await userManager.DeleteAsync(createdUser);
             }
 
-           var token = await CreateTokenAsync(user);
-
-            return Result<AuthResultDto>.Ok( new AuthResultDto
+            try
             {
-                UserId= user.Id,
-                IsAuthenticated = true,
-                Token = token,
-                PhoneNumber = phoneNumber
-            });
+              
+                var user = await userManager.Users.FirstOrDefaultAsync(u => u.PhoneNumber == dto.PhoneNumber);
+
+                if (user == null)
+                {
+                    user = new ApplicationUser
+                    {
+                        UserName = dto.PhoneNumber,
+                        PhoneNumber = dto.PhoneNumber
+                    };
+
+                    var createResult = await userManager.CreateAsync(user);
+                    if (!createResult.Succeeded)
+                        return Error.Failure("User.CreateFailed", "فشل إنشاء المستخدم");
+
+                    var roleResult = await userManager.AddToRoleAsync(user, userType.ToString());
+                    if (!roleResult.Succeeded)
+                    {
+                        await RevertUserCreationAsync(user); 
+                        return Error.Failure("User.RoleFailed", "فشل تعيين صلاحية المستخدم");
+                    }
+                    isNew= true;
+                }
+
+                // 5. إنشاء التوكن وإرجاع النتيجة
+                var token = await CreateTokenAsync(user);
+
+                return Result<AuthResultDto>.Ok(new AuthResultDto
+                {
+                    UserId = user.Id,
+                    IsAuthenticated = true,
+                    Token = token,
+                    PhoneNumber = dto.PhoneNumber,
+                    IsNew = isNew,
+                    ExpiresOn = DateTime.UtcNow.AddMonths(1)
+                });
+            }
+            catch (Exception)
+            {
+                return Error.Failure("System.Error", "حدث خطأ أثناء معالجة بيانات المستخدم");
+            }
         }
+
         private async Task<string> CreateTokenAsync(ApplicationUser user)
         {
-            var Claims = new List<Claim>(){
-                new(ClaimTypes.Name, user.FullName),
-                new(ClaimTypes.NameIdentifier, user.Id),
-                new ("TokenId",Guid.NewGuid().ToString()),
-                new (ClaimTypes.MobilePhone ,user.PhoneNumber)
-                };
+            var claims = new List<Claim>
+        {
+            new(ClaimTypes.NameIdentifier, user.Id),
+            new("TokenId", Guid.NewGuid().ToString()),
+            new(ClaimTypes.MobilePhone, user.PhoneNumber!)
+        };
 
-            var Roles = await userManager.GetRolesAsync(user);
+            var roles = await userManager.GetRolesAsync(user);
+            foreach (var role in roles)
+                claims.Add(new Claim(ClaimTypes.Role, role));
 
-            foreach (var role in Roles)
-                Claims.Add(new Claim(ClaimTypes.Role, role));
+            var secretKey = _configuration.GetSection("JWTOptions")["SecretKey"];
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey!));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            var SecretKey = _configuration.GetSection("JWTOptions")["SecretKey"];
-            var Key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(SecretKey));
-            var Cards = new SigningCredentials(Key, SecurityAlgorithms.HmacSha256);
-
-            var Token = new JwtSecurityToken(
+            var token = new JwtSecurityToken(
                 issuer: _configuration.GetSection("JWTOptions")["issuer"],
                 audience: _configuration.GetSection("JWTOptions")["Audience"],
-                claims: Claims,
-                expires: DateTime.Now.AddMonths(1),
-                signingCredentials: Cards
-                );
-            return new JwtSecurityTokenHandler().WriteToken(Token);
+                claims: claims,
+                expires: DateTime.UtcNow.AddMonths(1), // 💡 الأفضل دائماً استخدام UtcNow مع التوكنز
+                signingCredentials: creds
+            );
 
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
 }

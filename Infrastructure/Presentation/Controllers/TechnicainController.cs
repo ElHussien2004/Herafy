@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace Presentation.Controllers
 {
+    [Authorize(Roles = "Technician")]
     public class TechnicainController(IServiceManager _serviceManager):ApiBaseController
     {
         [HttpGet("Profile")]
@@ -43,6 +44,7 @@ namespace Presentation.Controllers
             return HandleResult(result);
         }
         [HttpPost("AddDocuments")]
+
         public async Task<ActionResult<bool>> UploadDocuments( [FromForm] UploadDocumentsDto dto)
         {
             var result = await _serviceManager.TechnicianService.UploadDocumentsAsync(GetUserId(), dto);

@@ -7,6 +7,7 @@ using Shared.DTOs.TechnicianDTOS;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -59,6 +60,11 @@ namespace Presentation.Controllers
 
             return HandleResult<int>(result);
         }
-
+        [HttpGet("GetTechnician")]
+        public async Task<ActionResult<GetDocumentDto>>GetDocument()
+        {
+            var result =await _serviceManager.TechnicianService.GetDocument(GetUserId());
+            return HandleResult<GetDocumentDto>(result);
+        }
     }
 }

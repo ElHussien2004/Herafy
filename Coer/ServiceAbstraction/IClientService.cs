@@ -13,7 +13,8 @@ namespace ServiceAbstraction
     {
         Task<Result<IEnumerable<ClientDto>>> GetAllAsync();
         public Task<Result<int>> CountAsync();
-        Task<Result<ClientDto?>> GetByIdAsync(string id);
+        Task<Result> UpdateAsync(string id, UpdataClientdto dto);
+        Task<Result<ClientDto>> GetByIdAsync(string id);
         Task <Result> AddAsync(string Userid,AddClientDto clientDto);
         Task<Result<bool>> ChangeIsActive(string id ,bool State);
         Task<Result<bool>> DeleteAsync(string id);

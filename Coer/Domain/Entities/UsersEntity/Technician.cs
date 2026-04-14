@@ -13,7 +13,6 @@ namespace Domain.Entities.UsersEntity
     public class Technician :BaseEntity<string>
     {
         #region Relation User
-        public string UserId { get; set; }//Fk +pk
         public ApplicationUser User { get; set; }
         #endregion
 

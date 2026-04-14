@@ -13,8 +13,8 @@ namespace Persistence.Data.Configrations
     {
         public void Configure(EntityTypeBuilder<Technician> builder)
         {
-            builder.HasKey(x => x.UserId);
-
+            builder.HasKey(x => x.Id);
+           
             builder.Property(x => x.Bio)
                    .HasMaxLength(1000);
 
@@ -30,7 +30,7 @@ namespace Persistence.Data.Configrations
             builder.Property(x => x.CompletedJobs)
                    .HasDefaultValue(0);
 
-            builder.HasIndex(x => x.UserId)
+            builder.HasIndex(x => x.Id)
                    .IsUnique();
 
             // Relation with ServiceCategory

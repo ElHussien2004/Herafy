@@ -15,14 +15,14 @@ namespace Presentation.Controllers
         [HttpPost("send-otp")]
         public async Task<IActionResult> SendOtp([FromBody] SendOtpDto dto)
         {
-            var result = await _serviceManager.AuthService.SendOtpAsync(dto.PhoneNumber);
+            var result = await _serviceManager.AuthService.SendOtpAsync(dto);
 
             return HandleResult(result);
         }
         [HttpPost("verify-otp")]
         public async Task<ActionResult<AuthResultDto>> VerifyOtp([FromBody] VerifyOtpDto dto)
         {
-            var result = await _serviceManager.AuthService.VerifyOtpAsync(dto.PhoneNumber, dto.OtpCode);
+            var result = await _serviceManager.AuthService.VerifyOtpAsync(dto);
 
             return HandleResult(result);
         }

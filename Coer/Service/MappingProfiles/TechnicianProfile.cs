@@ -34,8 +34,28 @@ namespace Service.MappingProfiles
                     ));
 
             CreateMap< AddTechnicianDto,Technician>();
-       
-          
+             
+
+            CreateMap<Technician,GetDocumentDto>()
+                .ForMember(d => d.ServiceCategory,
+                    opt => opt.MapFrom(s => s.ServiceCategory != null ? s.ServiceCategory.Name : null))
+                .ForMember(d => d.FullName,
+                    opt => opt.MapFrom(s => s.User != null ? s.User.FullName : null))
+                .ForMember(d => d.ProfileImageURL,
+                    opt => opt.MapFrom<URLResolver<Technician, GetDocumentDto>, string?>(
+                        s => s.User != null ? s.User.ProfileImageURL : null
+                    ))
+                .ForMember(d=>d.PhoneNumber ,sr=>sr.MapFrom(s=>s.User.PhoneNumber))
+                .ForMember(d => d.FaceImageUrl,
+                    opt => opt.MapFrom<URLResolver<Technician, GetDocumentDto>, string?>(
+                        s => s.Document != null ? s.Document.FaceImageUrl : null
+                    )).ForMember(d => d.BackImageUrl,
+                    opt => opt.MapFrom<URLResolver<Technician, GetDocumentDto>, string?>(
+                        s => s.Document != null ? s.Document.BackImageUrl : null
+                    ));
+
+
+
         }
     }
 }

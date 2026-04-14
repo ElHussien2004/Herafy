@@ -9,7 +9,7 @@ namespace Service.Specifications
 {
     class ClientSpecifications:BaseSpecifications<Client>
     {
-        public ClientSpecifications(string? id):base(C=>C.UserId==id)
+        public ClientSpecifications(string? id):base(C=>C.Id ==id)
         {
             AddInclude(C => C.User);
         }

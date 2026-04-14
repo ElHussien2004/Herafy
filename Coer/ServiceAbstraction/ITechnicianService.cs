@@ -21,6 +21,9 @@ namespace ServiceAbstraction
         Task<Result<bool>> UploadDocumentsAsync(string technicianId, UploadDocumentsDto documents);
         Task<Result<bool>> ToggleAvailabilityStatusAsync(string technicianId, bool isAvailable);
         Task<Result<bool>> ChangeIsActive(string id, bool State);
+
+        Task<Result<GetDocumentDto>> GetDocument(string id);
+
     }
 
   

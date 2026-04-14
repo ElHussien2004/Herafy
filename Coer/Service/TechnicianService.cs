@@ -16,7 +16,9 @@ using System.Threading.Tasks;
 
 namespace Service
 {
-    public class TechnicianService(IMapper _mapper, IUnitOfWork _unitOfWork, IFileService _fileService,UserManager<ApplicationUser> userManager,RoleManager<IdentityRole> roleManager) : ITechnicianService
+    public class TechnicianService(IMapper _mapper, IUnitOfWork _unitOfWork, 
+        IFileService _fileService,UserManager<ApplicationUser> userManager,
+        RoleManager<IdentityRole> roleManager) : ITechnicianService
     {
         public async Task<Result<IEnumerable<TechnicialDto>>> GetAllAsync(TechnicianQuery query)
         {
@@ -46,71 +48,77 @@ namespace Service
             // return Result<TechnicianDetailsDto>.Ok (_mapper.Map<TechnicianDetailsDto>(technician));
         }
 
-        public async Task<Result> AddAsync(string id ,AddTechnicianDto technicianDto)
+        public async Task<Result> AddAsync(string id, AddTechnicianDto technicianDto)
         {
-            // 1. Validate input
+            // 1. Fail-Fast Validations
+            
             if (technicianDto == null)
                 return Error.Validation("بيانات غير صالحة", "البيانات المرسلة غير صحيحة");
 
-            // 2. Get user
             var user = await userManager.FindByIdAsync(id);
-
             if (user == null)
-                return Error.NotFound(
-                    "المستخدم غير موجود",
-                    $"لا يوجد مستخدم بالمعرف {id}"
-                );
-            //Add Role
-            if (!await roleManager.RoleExistsAsync("Technician"))
-            {
-                await roleManager.CreateAsync(new IdentityRole("Technician"));
-            }
-
-            // Add Role to User
-            await userManager.AddToRoleAsync(user, "Technician");
-            // 3. Check if already technician
+                return Error.NotFound("المستخدم غير موجود", $"لا يوجد مستخدم بالمعرف {id}");
             var sp = new TechnicianSpecifications(id);
-            var existing = await _unitOfWork.TechnicalRepository
-                .GetByIdAsync(sp);
-
+            var existing = await _unitOfWork.TechnicalRepository.GetByIdAsync(sp);
             if (existing != null)
-                return Error.Validation(
-                    "موجود بالفعل",
-                    "هذا المستخدم مسجل بالفعل كفني"
-                );
+                return Error.Validation("موجود بالفعل", "هذا المستخدم مسجل بالفعل كفني");
+            // 2. Transaction start
+            using var transaction = await _unitOfWork.BeginTransactionAsync();
+            string? uploadedFilePath = null;
+            //(Local Function) 
+            async Task RevertChangesAsync()
+            {
+                await transaction.RollbackAsync();
 
-            // 4. Upload image
-            var uploadResult = await _fileService.SaveFileAsync(
-                technicianDto.Image,
-                "ProfileImage"
-            );
+                if (!string.IsNullOrEmpty(uploadedFilePath))
+                {
+                    await _fileService.DeleteAsync(uploadedFilePath); // أو DeleteAsync حسب مسمى الدالة عندك
+                }
+            }
+            try
+            {
+                // 3. saveFile
+                var uploadResult = await _fileService.SaveFileAsync(technicianDto.Image, "ProfileImage");
+                if (!uploadResult.IsSuccess)
+                    return uploadResult; 
 
-            if (!uploadResult.IsSuccess)
-                return uploadResult;
+                uploadedFilePath = uploadResult.Value;
 
-            // 5. Update user
-            user.FullName = technicianDto.FullName;
-            user.ProfileImageURL = uploadResult.Value;
+                // 4-Database Operations
+                 //4.1 UpdatUser
+                    user.FullName = technicianDto.FullName;
+                    user.ProfileImageURL = uploadedFilePath;
+                    var updateResult = await userManager.UpdateAsync(user);
 
-            var updateResult = await userManager.UpdateAsync(user);
+                    if (!updateResult.Succeeded)
+                    {
+                        await RevertChangesAsync();
+                        return Error.Failure("تحديث_فشل", "فشل تحديث بيانات المستخدم");
+                    }
 
-            if (!updateResult.Succeeded)
-                return  Error.Failure(
-                    "فشل تحديث المستخدم",
-                    "حدث خطأ أثناء تحديث بيانات المستخدم"
-                );
+                
 
-            // 6. Create technician
-            var technician = _mapper.Map<Technician>(technicianDto);
+                  // 4.3- Create And Save Tech
+                    var technician = _mapper.Map<Technician>(technicianDto);
+                    technician.Id = id;
 
-            await _unitOfWork.TechnicalRepository.AddAsync(technician);
+                     await _unitOfWork.TechnicalRepository.AddAsync(technician);
+                     await _unitOfWork.SaveAsync();
+                // 5 (Commit)
+                await transaction.CommitAsync();
 
-            // 7. Save changes
-            await _unitOfWork.SaveAsync();
+                return Result.Ok();
+            }
+            catch (Exception ex)
+            {
 
-            return Result.Ok();
+                await RevertChangesAsync();
+
+                // _logger.LogError(ex, "System error occurred during Add Technician process.");
+
+                return Error.Failure("خطأ_نظام", "حدث خطأ غير متوقع بالنظام ولم يتم حفظ البيانات.");
+            }
         }
-
 
 
         public async Task<Result> UpdateAsync(string id,UpdateTechnicianDto technicianDto)
@@ -118,6 +126,11 @@ namespace Service
 
             if (technicianDto == null)
                 return Error.Validation("بيانات غير صالحة", "البيانات المرسلة فارغة");
+            var sp = new TechnicianSpecifications(id);
+            // get tec 
+            var technician = await _unitOfWork.TechnicalRepository.GetByIdAsync(sp);
+            if (technician == null)
+                return Error.NotFound("الفني غير موجود", $"لا يوجد فني بالمعرف {id}");
             //GET USER update fullname ,image 
             var user = await userManager.FindByIdAsync(id);
             if (user == null)
@@ -128,6 +141,8 @@ namespace Service
                 var uploadResult = await _fileService.SaveFileAsync(technicianDto.ImageUrl, "ProfileImage");
                 if (!uploadResult.IsSuccess)
                     return uploadResult;
+                if(!string.IsNullOrEmpty(user.ProfileImageURL))
+                    await _fileService.DeleteAsync(user.ProfileImageURL);
                 user.ProfileImageURL = uploadResult.Value;
             }
             var updateResult = await userManager.UpdateAsync(user);
@@ -137,16 +152,11 @@ namespace Service
                     "فشل تحديث المستخدم",
                     string.Join(", ", updateResult.Errors.Select(e => e.Description))
                 );
-            var sp = new TechnicianSpecifications(id);
-            // get tec 
-            var technician = await _unitOfWork.TechnicalRepository.GetByIdAsync(sp);
-            if (technician == null)
-                return Error.NotFound("الفني غير موجود", $"لا يوجد فني بالمعرف {id}");
-
             technician.Bio  = technicianDto.Bio;
             technician.ExperienceYears = technicianDto.ExperienceYears;
             technician.InspectedPrice = technicianDto.InspectedPrice;
-
+            technician.City= technicianDto.City;
+            technician.Government= technicianDto.Government;
             //update tec
             _unitOfWork.TechnicalRepository.Update(technician);
             try
@@ -232,7 +242,7 @@ namespace Service
             if (!saveReBack.IsSuccess)
                  return Error.Failure("فشل عمليه الحفظ", "حدث غطأ في الملفات المرسلة  يرجو الرفع مره اخري");
             ;
-
+            
             // 4. Create document
             var document = new TechnicianDocument
             {
@@ -338,6 +348,18 @@ namespace Service
         {
             var count = await _unitOfWork.TechnicalRepository.CountAsync();
             return Result<int>.Ok(count);
+        }
+
+        public async Task<Result<GetDocumentDto>> GetDocument(string id)
+        {
+            var sp = new TechnicianSpecifications(id);
+            var technician = await _unitOfWork.TechnicalRepository.GetByIdAsync(sp);
+            if (technician == null)
+                return Error.NotFound("الفني غير موجود ", $"الفني {id} غير موجود  ");
+            
+            var doc=_mapper.Map<GetDocumentDto>(technician);
+            
+            return Result<GetDocumentDto>.Ok(doc);
         }
     }
 }

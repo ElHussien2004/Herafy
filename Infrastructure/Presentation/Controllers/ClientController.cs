@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using ServiceAbstraction;
 using Shared.DTOs.ClientDTOS;
+using Shared.DTOs.TechnicianDTOS;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace Presentation.Controllers
 {
+    [Authorize(Roles = "Client")]
     public class ClientController(IServiceManager _serviceManager):ApiBaseController
     {
         [HttpPost("AddClient")]
@@ -25,6 +28,18 @@ namespace Presentation.Controllers
 
             return HandleResult(result);
         }
+        [HttpPatch("Update")]
+        public async Task<IActionResult> Update([FromForm] UpdataClientdto dto)
+        {
+            var result = await _serviceManager.ClientService.UpdateAsync(GetUserId(), dto);
 
+            return HandleResult(result);
+        }
+        [HttpGet("Profile")]
+        public async Task<ActionResult<ClientDto>> GetProfile()
+        {
+            var result = await _serviceManager.ClientService.GetByIdAsync(GetUserId());
+            return HandleResult(result);
+        }
     }
 }

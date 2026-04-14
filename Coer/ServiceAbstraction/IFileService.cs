@@ -10,7 +10,8 @@ namespace ServiceAbstraction
 {
     public interface IFileService
     {
-        Task<Result<string>> SaveFileAsync(IFormFile file, string relativePath);
-        Task<bool> DeleteFile(string filePath);
+        Task<Result<string>> SaveFileAsync(IFormFile file, string folderName );
+        Task<Result> DeleteAsync(string filePath);
+        Task<Result<string>> UpdateAsync(string oldFilePath, IFormFile newFile, string folderName );
     }
 }

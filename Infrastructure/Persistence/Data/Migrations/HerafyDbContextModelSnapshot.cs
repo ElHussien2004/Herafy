@@ -340,7 +340,7 @@ namespace Persistence.Data.Migrations
 
             modelBuilder.Entity("Domain.Entities.UsersEntity.Client", b =>
                 {
-                    b.Property<string>("UserId")
+                    b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("City")
@@ -364,9 +364,9 @@ namespace Persistence.Data.Migrations
                     b.Property<double>("Longitude")
                         .HasColumnType("float");
 
-                    b.HasKey("UserId");
+                    b.HasKey("Id");
 
-                    b.HasIndex("UserId")
+                    b.HasIndex("Id")
                         .IsUnique();
 
                     b.ToTable("Clients");
@@ -374,7 +374,7 @@ namespace Persistence.Data.Migrations
 
             modelBuilder.Entity("Domain.Entities.UsersEntity.Technician", b =>
                 {
-                    b.Property<string>("UserId")
+                    b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<bool>("AvailabilityStatus")
@@ -401,9 +401,6 @@ namespace Persistence.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<decimal>("InspectedPrice")
                         .HasColumnType("decimal(10,2)");
 
@@ -426,12 +423,12 @@ namespace Persistence.Data.Migrations
                     b.Property<int>("ServiceCategoryId")
                         .HasColumnType("int");
 
-                    b.HasKey("UserId");
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
 
                     b.HasIndex("ServiceCategoryId");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
 
                     b.ToTable("Technicians");
                 });
@@ -592,7 +589,7 @@ namespace Persistence.Data.Migrations
                 {
                     b.HasOne("Domain.Entities.UsersEntity.ApplicationUser", "User")
                         .WithOne("Client")
-                        .HasForeignKey("Domain.Entities.UsersEntity.Client", "UserId")
+                        .HasForeignKey("Domain.Entities.UsersEntity.Client", "Id")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -601,15 +598,15 @@ namespace Persistence.Data.Migrations
 
             modelBuilder.Entity("Domain.Entities.UsersEntity.Technician", b =>
                 {
-                    b.HasOne("Domain.Entities.ServiceEntity.ServiceCategory", "ServiceCategory")
-                        .WithMany("Technicians")
-                        .HasForeignKey("ServiceCategoryId")
+                    b.HasOne("Domain.Entities.UsersEntity.ApplicationUser", "User")
+                        .WithOne("Technician")
+                        .HasForeignKey("Domain.Entities.UsersEntity.Technician", "Id")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.UsersEntity.ApplicationUser", "User")
-                        .WithOne("Technician")
-                        .HasForeignKey("Domain.Entities.UsersEntity.Technician", "UserId")
+                    b.HasOne("Domain.Entities.ServiceEntity.ServiceCategory", "ServiceCategory")
+                        .WithMany("Technicians")
+                        .HasForeignKey("ServiceCategoryId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 

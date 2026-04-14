@@ -1,5 +1,6 @@
 ﻿using Domain.Entities;
 using Domain.Entities.UsersEntity;
+using Microsoft.EntityFrameworkCore.Storage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +16,7 @@ namespace Domain.Contracts
         public IGenericRepository<Client, string> ClientRepository { get; }
 
         public IGenericRepository<TechnicianDocument, string> DocumentRepository { get; }
-
+        Task<IDbContextTransaction> BeginTransactionAsync();
         Task<int> SaveAsync();
 
     }
