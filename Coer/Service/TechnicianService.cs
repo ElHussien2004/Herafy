@@ -8,6 +8,7 @@ using ServiceAbstraction;
 using Shared;
 using Shared.CommonResult;
 using Shared.DTOs.TechnicianDTOS;
+using Shared.DTOs.TechnicianDTOS.ServiceCategry;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,18 +21,26 @@ namespace Service
         IFileService _fileService,UserManager<ApplicationUser> userManager,
         RoleManager<IdentityRole> roleManager) : ITechnicianService
     {
-        public async Task<Result<IEnumerable<TechnicialDto>>> GetAllAsync(TechnicianQuery query)
+        public async Task<Result<IEnumerable<TechnicianDto>>> GetAllAsync(TechnicianQuery? query)
         {
-            var sp = new TechnicianSpecifications(query);
+            IEnumerable<Technician> technicians=[];
+            if (query != null) {
 
-            var technicians = await _unitOfWork.TechnicalRepository.GetAllAsync(sp);
+                var sp = new TechnicianSpecifications(query);
+                technicians = await _unitOfWork.TechnicalRepository.GetAllAsync(sp);
+            }
+            else
+            {
+                technicians=await _unitOfWork.TechnicalRepository.GetAllAsync();
+            }
+            
             if (technicians == null || !technicians.Any())
             {
-                return Result<IEnumerable<TechnicialDto>>.Ok(Enumerable.Empty<TechnicialDto>());
+                return Result<IEnumerable<TechnicianDto>>.Ok(Enumerable.Empty<TechnicianDto>());
             }
-            var mappedData = _mapper.Map<IEnumerable<TechnicialDto>>(technicians);
+            var mappedData = _mapper.Map<IEnumerable<TechnicianDto>>(technicians);
 
-            return Result<IEnumerable<TechnicialDto>>.Ok(mappedData);
+            return Result<IEnumerable<TechnicianDto>>.Ok(mappedData);
         }
 
         public async Task<Result<TechniciaDetailsDto>> GetByIdAsync(string id)
@@ -361,5 +370,19 @@ namespace Service
             
             return Result<GetDocumentDto>.Ok(doc);
         }
+
+        public async Task<Result<IEnumerable<ServiceDto>>> GetAllService()
+        {
+            var services = await _unitOfWork.ServiceCategoryRepository.GetAllAsync();
+            if (services == null || !services.Any())
+            {
+                return Result<IEnumerable<ServiceDto>>.Ok(Enumerable.Empty<ServiceDto>());
+            }
+            var mappedData = _mapper.Map<IEnumerable<ServiceDto>>(services);
+
+            return Result<IEnumerable<ServiceDto>>.Ok(mappedData);
+        }
     }
+
+    
 }

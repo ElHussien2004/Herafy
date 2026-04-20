@@ -18,8 +18,7 @@ namespace Persistence.Data.Configrations
             builder.Property(x => x.Name)
                    .IsRequired();
 
-            builder.Property(x => x.IconUrl)
-                   .HasMaxLength(500);
+            
 
             // Relation with Technicians
             builder.HasMany(x => x.Technicians)

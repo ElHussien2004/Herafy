@@ -11,7 +11,9 @@ namespace ServiceAbstraction
 {
     public interface IAuthService
     {
-        Task<Result> SendOtpAsync(SendOtpDto dto);
+        Task<Result<string >> SendOtpAsync(SendOtpDto dto);
         Task<Result<AuthResultDto>> VerifyOtpAsync(VerifyOtpDto dto);
+
+        Task<Result<ReturnAdminDto>> Login(LoginAdminDto dto);
     }
 }

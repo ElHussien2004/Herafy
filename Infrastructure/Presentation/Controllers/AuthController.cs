@@ -13,7 +13,7 @@ namespace Presentation.Controllers
     public class AuthController(IServiceManager _serviceManager):ApiBaseController
     {
         [HttpPost("send-otp")]
-        public async Task<IActionResult> SendOtp([FromBody] SendOtpDto dto)
+        public async Task<ActionResult<string>> SendOtp([FromBody] SendOtpDto dto)
         {
             var result = await _serviceManager.AuthService.SendOtpAsync(dto);
 
@@ -24,6 +24,12 @@ namespace Presentation.Controllers
         {
             var result = await _serviceManager.AuthService.VerifyOtpAsync(dto);
 
+            return HandleResult(result);
+        }
+        [HttpPost("Login")]
+        public async Task<ActionResult<ReturnAdminDto>> Login([FromBody] LoginAdminDto dto)
+        {
+            var result =await _serviceManager.AuthService.Login(dto);
             return HandleResult(result);
         }
     }

@@ -23,6 +23,7 @@ namespace Domain.Entities.UsersEntity
         public string City { get; set; }
 
         public string Government { get; set; }
+        public DateTime CreatedAt { get; set; }
         public bool IsActive { get; set; }
         public double Latitude { get; set; }
 

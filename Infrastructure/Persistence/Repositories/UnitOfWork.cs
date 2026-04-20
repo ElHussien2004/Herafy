@@ -1,4 +1,5 @@
 ﻿using Domain.Contracts;
+using Domain.Entities.ServiceEntity;
 using Domain.Entities.UsersEntity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -25,7 +26,10 @@ namespace Persistence.Repositories
         private readonly Lazy<IGenericRepository<TechnicianDocument, string>> _documentRepo =
            new(() => new GenericRepository<TechnicianDocument, string>(_Context));
         public IGenericRepository<TechnicianDocument, string> DocumentRepository => _documentRepo.Value;
-       
+
+        private readonly Lazy<IGenericRepository<ServiceCategory, int>> _ServicRepo =
+           new(() => new GenericRepository<ServiceCategory, int>(_Context));
+        public IGenericRepository<ServiceCategory, int> ServiceCategoryRepository => _ServicRepo.Value;
         public Task<int> SaveAsync() => _Context.SaveChangesAsync();
         public async Task<IDbContextTransaction> BeginTransactionAsync()
         {

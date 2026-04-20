@@ -4,12 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Shared
+namespace Shared.DTOs.TechnicianDTOS.ServiceCategry
 {
-    public enum UserType
+    public class ServiceDto
     {
-        Technician,
-        Client,
-        Admin
+        public string? Name { get; set; }
     }
 }

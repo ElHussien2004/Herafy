@@ -14,7 +14,11 @@ namespace Persistence.Data.Configrations
         public void Configure(EntityTypeBuilder<Technician> builder)
         {
             builder.HasKey(x => x.Id);
-           
+
+            builder.Property(x => x.CreatedAt)
+                  .HasDefaultValueSql("GETDATE()")
+                  .ValueGeneratedOnAdd();
+
             builder.Property(x => x.Bio)
                    .HasMaxLength(1000);
 

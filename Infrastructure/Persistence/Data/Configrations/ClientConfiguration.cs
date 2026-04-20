@@ -22,9 +22,12 @@ namespace Persistence.Data.Configrations
             builder.Property(x => x.Government)
                    .IsRequired()
                    .HasMaxLength(100);
+            builder.Property(x => x.CreatedAt)
+                  .HasDefaultValueSql("GETDATE()")
+                  .ValueGeneratedOnAdd();
 
             builder.Property(x => x.IsActive)
-                   .HasDefaultValue(false);
+                  .HasDefaultValue(true);
 
             builder.HasIndex(x => x.Id)
                    .IsUnique(); // One To One

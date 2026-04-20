@@ -9,6 +9,7 @@ namespace Shared
     public class TechnicianQuery
     {
         public int? ServiceId { get; set; }
+        public string? Search {  get; set; }
         public TecnicianSorting Sorting { get; set; }
         public double? ClientLatitude { get; set; }
         public double? ClientLongitude { get; set; }

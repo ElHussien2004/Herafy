@@ -9,13 +9,18 @@ namespace Service.Specifications
 {
     class ClientSpecifications:BaseSpecifications<Client>
     {
-        public ClientSpecifications(string? id):base(C=>C.Id ==id)
+        public ClientSpecifications(string id):base(C=>C.Id ==id)
         {
             AddInclude(C => C.User);
         }
-        public ClientSpecifications():base(null)
-        {
-            AddInclude(C => C.User);
-        }
+         public ClientSpecifications(string? search,bool s)
+            : base(c =>
+                string.IsNullOrEmpty(search) ||
+                c.User.FullName.ToLower().Contains(search) ||
+                c.User.PhoneNumber.Contains(search))
+         {
+                   AddInclude(c => c.User);
+                   AddInclude(c => c.Orders);
+         }
     }
 }

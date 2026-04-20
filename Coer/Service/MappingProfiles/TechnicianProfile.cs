@@ -10,9 +10,9 @@ using System.Threading.Tasks;
 
 namespace Service.MappingProfiles
 {
-    public class TechnicianProfile : Profile
+    public class ServicProfile : Profile
     {
-        public TechnicianProfile()
+        public ServicProfile()
         {
             CreateMap<Technician, TechniciaDetailsDto>()
                 .ForMember(d => d.ServiceCategory,
@@ -23,15 +23,16 @@ namespace Service.MappingProfiles
                     opt => opt.MapFrom<URLResolver<Technician, TechniciaDetailsDto>, string?>(
                         s => s.User != null ? s.User.ProfileImageURL : null));
 
-            CreateMap<Technician, TechnicialDto>()
+            CreateMap<Technician, TechnicianDto>()
                 .ForMember(d => d.ServiceCategory,
                     opt => opt.MapFrom(s => s.ServiceCategory != null ? s.ServiceCategory.Name : null))
                 .ForMember(d => d.Fullname,
                     opt => opt.MapFrom(s => s.User != null ? s.User.FullName : null))
                 .ForMember(d => d.ProfileImageURL,
-                    opt => opt.MapFrom<URLResolver<Technician, TechnicialDto>, string?>(
+                    opt => opt.MapFrom<URLResolver<Technician, TechnicianDto>, string?>(
                         s => s.User != null ? s.User.ProfileImageURL : null
-                    ));
+                    ))
+                .ForMember(des=>des.UserId,sr=>sr.MapFrom(s=>s.Id));
 
             CreateMap< AddTechnicianDto,Technician>();
              

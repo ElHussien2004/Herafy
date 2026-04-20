@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using ServiceAbstraction;
 using Shared;
 using Shared.CommonResult;
@@ -13,20 +14,20 @@ using System.Threading.Tasks;
 
 namespace Presentation.Controllers
 {
+    [Authorize(Roles = Roles.Admin)]
     public class AdminController(IServiceManager _serviceManager):ApiBaseController
     {
         [HttpGet("GetAllTechnicians")]
-        public async Task<ActionResult<IEnumerable<TechnicialDto>>> GetAll([FromQuery] TechnicianQuery query)
+        public async Task<ActionResult<IEnumerable<TechnicianDto>>> GetAll([FromQuery] TechnicianQuery query)
         {
             var result = await _serviceManager.TechnicianService.GetAllAsync(query);
 
-            return HandleResult<IEnumerable<TechnicialDto>>(result);
+            return HandleResult<IEnumerable<TechnicianDto>>(result);
         }
-
         [HttpGet("GetAllClient")]
-        public async Task<ActionResult<IEnumerable<ClientDto>>> GetAll()
+        public async Task<ActionResult<IEnumerable<ClientDto>>> GetAllClient([FromQuery]string? Search )
         {
-            var result = await _serviceManager.ClientService.GetAllAsync();
+            var result = await _serviceManager.ClientService.GetAllAsync(Search);
 
             return HandleResult(result);
         }
@@ -39,7 +40,7 @@ namespace Presentation.Controllers
             return HandleResult(result);
         }
 
-        [HttpPatch("{id}/ActiveClient")]
+        [HttpPatch("{id}/BlockClient")]
         public async Task<ActionResult<bool>> ChangeActiveCl(string id, [FromQuery] bool state)
         {
             var result = await _serviceManager.ClientService.ChangeIsActive(id, state);
@@ -60,11 +61,20 @@ namespace Presentation.Controllers
 
             return HandleResult<int>(result);
         }
-        [HttpGet("GetTechnician")]
-        public async Task<ActionResult<GetDocumentDto>>GetDocument()
+        [HttpGet("GetClientDetails")]
+        public async Task<ActionResult<ClientDetailsDto>> GetClientDetails(string id)
         {
-            var result =await _serviceManager.TechnicianService.GetDocument(GetUserId());
+            var result = await _serviceManager.ClientService.GetByIdAsync(id);
+            return HandleResult<ClientDetailsDto>(result);
+        }
+
+        [HttpGet("GetTechnician")]
+        public async Task<ActionResult<GetDocumentDto>>GetDocument(string id)
+        {
+            var result =await _serviceManager.TechnicianService.GetDocument(id);
             return HandleResult<GetDocumentDto>(result);
         }
+
+
     }
 }

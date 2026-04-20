@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Shared.DTOs.TechnicianDTOS
 {
-    public class TechnicialDto
+    public class TechnicianDto
     {
-       
+       public string UserId { get; set; }
         public string Fullname { get; set; }
         public string? ProfileImageURL { get; set; }
         public string ServiceCategory { get; set; }
@@ -17,7 +17,7 @@ namespace Shared.DTOs.TechnicianDTOS
         public bool AvailabilityStatus { get; set; }//هو متاح للطلب ولا لا 
         public bool IsActive { get; set; }
         public double RatingAvg { get; set; }
-
+        public DateTime CreatedAt { get; set; }
         public int CompletedJobs { get; set; }
 
     }

@@ -24,13 +24,14 @@ namespace Service
     {
         private readonly IDatabase _database = connection.GetDatabase();
 
-        public async Task<Result> SendOtpAsync(SendOtpDto dto)
+
+        public async Task<Result<string>> SendOtpAsync(SendOtpDto dto)
         {
             // 1. Fail-Fast Validations
             if (string.IsNullOrWhiteSpace(dto.PhoneNumber))
                 return Error.Validation("Phone.Empty", "رقم الهاتف مطلوب");
 
-            if (dto.UserType.ToString() != "Technician" && dto.UserType.ToString() != "Client")
+            if (dto.UserType.ToString() != "Technician" && dto.UserType.ToString() != "Client" )
                 return Error.Validation("UserType.Invalid", "نوع المستخدم غير صحيح");
 
             var otpKey = $"otp:{dto.PhoneNumber}";
@@ -63,7 +64,7 @@ namespace Service
                     return Error.Failure("SMS.Failed", "فشل في إرسال الرسالة");
                 }
 
-                return Result.Ok();
+                return Result<string>.Ok(dto.PhoneNumber);
             }
             catch (Exception)
             {
@@ -145,6 +146,35 @@ namespace Service
             }
         }
 
+        public async Task<Result<ReturnAdminDto>> Login(LoginAdminDto dto)
+        {
+            if (dto ==null)
+                return Error.Validation("OTP.InvalidInput", "بيانات غير صحيحة");
+            var Admin=await userManager.FindByEmailAsync(dto.Email);
+
+            if (Admin==null)
+                return Error.NotFound("Email Or Password Is Not Correct", " الباسورد او الاميل غلط ");
+
+            var PassRight = await userManager.CheckPasswordAsync(Admin,dto.Password);
+
+            if(PassRight)
+            {
+                return Result<ReturnAdminDto>.Ok(
+                    new ReturnAdminDto()
+                    {
+                        Token=await CreateTokenAsync(Admin),
+                        Email=dto.Email,
+                        DisplayName=Admin.FullName
+                    }
+
+                    );
+            }
+            else
+            {
+                return Error.Failure("Password Wrong", "الباسورد غير صحيح ");
+            }
+        }
+            
         private async Task<string> CreateTokenAsync(ApplicationUser user)
         {
             var claims = new List<Claim>

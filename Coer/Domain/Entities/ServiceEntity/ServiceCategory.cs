@@ -11,9 +11,6 @@ namespace Domain.Entities.ServiceEntity
     public class ServiceCategory:BaseEntity<int>
     {
         public string Name { get; set; }
-
-        public string IconUrl { get; set; }
-
         public ICollection<Technician> Technicians { get; set; }
         public ICollection<Order> Orders { get; set; }
     }

@@ -2,6 +2,7 @@
 using Shared;
 using Shared.CommonResult;
 using Shared.DTOs.TechnicianDTOS;
+using Shared.DTOs.TechnicianDTOS.ServiceCategry;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,8 @@ namespace ServiceAbstraction
 {
     public interface ITechnicianService
     {
-        Task<Result<IEnumerable<TechnicialDto>>> GetAllAsync(TechnicianQuery ParamsQuery);
+        Task<Result<IEnumerable<TechnicianDto>>> GetAllAsync(TechnicianQuery ParamsQuery);
+        Task<Result<IEnumerable<ServiceDto>>>GetAllService();
         Task<Result<TechniciaDetailsDto>> GetByIdAsync(string id);
         Task<Result> AddAsync(string Id,AddTechnicianDto technician);
         Task<Result> UpdateAsync(string id,UpdateTechnicianDto technician);

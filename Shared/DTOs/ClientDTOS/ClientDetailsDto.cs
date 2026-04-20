@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Shared.DTOs.ClientDTOS
 {
-    public class ClientDto
+    public class ClientDetailsDto
     {
         public string UserId { get; set; }
         public string FullName { get; set; }
@@ -17,7 +17,6 @@ namespace Shared.DTOs.ClientDTOS
         public bool IsActive { get; set; }
         public DateTime CreatedAt { get; set; }
         public int NumberOfOrder { get; set; }
-        public double Latitude { get; set; }
-        public double Longitude { get; set; }
+      
     }
 }

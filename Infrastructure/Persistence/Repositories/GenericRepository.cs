@@ -27,6 +27,8 @@ namespace Persistence.Repositories
           
         }
 
+        public async Task<IEnumerable<TEntity>> GetAllAsync() => await _dbContext.Set<TEntity>().ToListAsync();
+
         public async Task<TEntity?> GetByIdAsync(ISpecifications<TEntity> specifications)
         {
             return await QueryGenerator.CreateQuery(_dbContext.Set<TEntity>(), specifications).FirstOrDefaultAsync();

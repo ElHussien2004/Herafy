@@ -89,7 +89,7 @@ namespace Service
 
                 return Result.Ok();
             }
-            catch (Exception ex)
+            catch 
             {
                 await RevertChangesAsync();
 
@@ -99,37 +99,7 @@ namespace Service
             }
         }
 
-        public async Task<Result<bool>> ChangeIsActive(string id ,bool state)
-        {
-            //get client 
-            if (id == null)
-                return Result<bool>.Fail( Error.Validation("بيانات غير صالحة", "يجب إدخال بيانات العميل"));
-
-            var sp = new ClientSpecifications(id);
-            var client =await _unitOfWork.ClientRepository.GetByIdAsync(sp);
-
-            if (client == null)
-                    return Error.NotFound("العميل غير موجود", $"لا يوجد العميل بالمعرف {id}");
-            // is active false 
-
-            client.IsActive = state;
-            // update 
-             _unitOfWork.ClientRepository.Update(client);
-            //save change
-            try
-            {
-                await _unitOfWork.SaveAsync();
-            }
-            catch (Exception)
-            {
-                return Error.Failure(
-                    "فشل حفظ البيانات",
-                    "حدث خطأ أثناء حفظ التعديلات"
-                );
-            }
-            //return Ok.Success();
-            return Result<bool>.Ok(true);
-        }
+       
 
         public async Task<Result<int>> CountAsync()
         {
@@ -169,9 +139,10 @@ namespace Service
             return Result<bool>.Ok(true);
         }
 
-        public async Task<Result<IEnumerable<ClientDto>>> GetAllAsync()
+        public async Task<Result<IEnumerable<ClientDto>>> GetAllAsync(string? Search)
         {
-            var sp = new ClientSpecifications();
+            
+            var sp = new ClientSpecifications(Search ,true);
             var clients= await _unitOfWork.ClientRepository.GetAllAsync(sp);
 
             if (clients == null || !clients.Any())
@@ -183,14 +154,14 @@ namespace Service
             return Result<IEnumerable<ClientDto>>.Ok(mappedData);
         }
 
-        public async Task<Result<ClientDto>> GetByIdAsync(string id)
+        public async Task<Result<ClientDetailsDto>> GetByIdAsync(string id)
         {
-            var sp = new ClientSpecifications();
+            var sp = new ClientSpecifications(id);
             var client = await _unitOfWork.ClientRepository.GetByIdAsync(sp);
             if (client == null)
                 return Error.NotFound("العميل غير موجود ", $"العميل {id} غير موجود  ");
 
-            return Result<ClientDto?>.Ok(_mapper.Map<ClientDto>(client));
+            return Result<ClientDetailsDto>.Ok(_mapper.Map<ClientDetailsDto>(client));
         }
 
         public async Task<Result> UpdateAsync(string id, UpdataClientdto dto)
@@ -238,6 +209,37 @@ namespace Service
                 );
             }
             return Result.Ok();
+        }
+        public async Task<Result<bool>> ChangeIsActive(string id, bool state)
+        {
+            //get client 
+            if (id == null)
+                return Result<bool>.Fail(Error.Validation("بيانات غير صالحة", "يجب إدخال بيانات العميل"));
+
+            var sp = new ClientSpecifications(id);
+            var client = await _unitOfWork.ClientRepository.GetByIdAsync(sp);
+
+            if (client == null)
+                return Error.NotFound("العميل غير موجود", $"لا يوجد العميل بالمعرف {id}");
+            // is active false 
+
+            client.IsActive = state;
+            // update 
+            _unitOfWork.ClientRepository.Update(client);
+            //save change
+            try
+            {
+                await _unitOfWork.SaveAsync();
+            }
+            catch (Exception)
+            {
+                return Error.Failure(
+                    "فشل حفظ البيانات",
+                    "حدث خطأ أثناء حفظ التعديلات"
+                );
+            }
+            //return Ok.Success();
+            return Result<bool>.Ok(true);
         }
     }
 }
