@@ -50,11 +50,16 @@ namespace Herafy.Api
             builder.Services.AddScoped<ITechnicianService, TechnicianService>();
             builder.Services.AddScoped<IFileService, FileService>();
             builder.Services.AddScoped<IAuthService, AuthService>();
-            builder.Services.AddAutoMapper(a => a.AddProfile(new ServicProfile()));
             builder.Services.AddScoped<IServiceManager, ServiceManager>();
+            builder.Services.AddScoped<IOrderService, OrderService>();
+
+            #region Profile AutoMapper
+            builder.Services.AddAutoMapper(a => a.AddProfile(new ServicProfile()));
             builder.Services.AddAutoMapper(c=>c.AddProfile(new ClientProfile()));
             builder.Services.AddAutoMapper(c => c.AddProfile(new ServicProfile()));
             builder.Services.AddAutoMapper(c => c.AddProfile(new ServicProfile()));
+            builder.Services.AddAutoMapper(c => c.AddProfile(new OrderProfile()));
+            #endregion
 
             builder.Services.AddScoped(typeof(URLResolver<,>));
             builder.Services.AddSingleton<IConnectionMultiplexer>((_) =>

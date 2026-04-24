@@ -32,15 +32,16 @@ namespace Domain.Entities.OrderEntity
 
         public string Government { get; set; }
 
-        public double Latitude { get; set; }
+        public string PlaceDetails { get; set; }
+        public string ProblemDetails { get; set; }
 
-        public double Longitude { get; set; }
-
+        public string? ImageWorkURL { get; set; }
         public DateTime ScheduledDate { get; set; }
 
         public TimeSpan ScheduledTime { get; set; }
 
         public State Status { get; set; } //(pending – accepted – completed… reject)
+        public decimal InspectedPrice { get; set; }
 
         public decimal FinalPrice { get; set; }
 

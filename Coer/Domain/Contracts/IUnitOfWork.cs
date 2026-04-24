@@ -1,4 +1,5 @@
 ﻿using Domain.Entities;
+using Domain.Entities.OrderEntity;
 using Domain.Entities.ServiceEntity;
 using Domain.Entities.UsersEntity;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -18,6 +19,7 @@ namespace Domain.Contracts
 
         public IGenericRepository<TechnicianDocument, string> DocumentRepository { get; }
         public IGenericRepository<ServiceCategory, int> ServiceCategoryRepository { get; }
+        public IGenericRepository<Order , int> OrderRepo { get; }
         Task<IDbContextTransaction> BeginTransactionAsync();
         Task<int> SaveAsync();
 

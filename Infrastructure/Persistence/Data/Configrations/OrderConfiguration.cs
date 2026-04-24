@@ -23,14 +23,6 @@ namespace Persistence.Data.Configrations
                    .IsRequired()
                    .HasMaxLength(100);
 
-            builder.Property(x => x.Latitude)
-                   .HasColumnType("decimal(9,6)")
-                   .IsRequired();
-
-            builder.Property(x => x.Longitude)
-                   .HasColumnType("decimal(9,6)")
-                   .IsRequired();
-            
 
             builder.Property(x => x.ScheduledDate)
                    .IsRequired();
@@ -46,7 +38,7 @@ namespace Persistence.Data.Configrations
                    .ValueGeneratedOnAdd();
 
             builder.Property(x => x.Status)
-                   .HasConversion<int>() // Enum State to int
+                   .HasConversion<string>() // Enum State to string
                    .IsRequired();
 
             // Relation with Client

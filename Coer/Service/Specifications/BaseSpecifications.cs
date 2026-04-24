@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Service.Specifications
 {
-    internal abstract class BaseSpecifications<TEntity> : ISpecifications<TEntity>
+    public abstract class BaseSpecifications<TEntity> : ISpecifications<TEntity>
     {
         public BaseSpecifications(Expression<Func<TEntity, bool>>? expression)
         {

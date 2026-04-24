@@ -8,10 +8,11 @@ namespace Domain.Entities.OrderEntity
 {
     public enum State
     {
-        pending=1, 
-        accepted=2 ,
-        reject = 3,
-        completed =4
-        
+        Pending = 0,
+        Accepted = 1,
+        Rejected = 2,
+        InProgress = 3,
+        Completed = 4,
+        Cancelled = 5
     }
 }

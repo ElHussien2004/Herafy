@@ -1,4 +1,5 @@
 ﻿using Domain.Contracts;
+using Domain.Entities.OrderEntity;
 using Domain.Entities.ServiceEntity;
 using Domain.Entities.UsersEntity;
 using Microsoft.EntityFrameworkCore;
@@ -30,6 +31,11 @@ namespace Persistence.Repositories
         private readonly Lazy<IGenericRepository<ServiceCategory, int>> _ServicRepo =
            new(() => new GenericRepository<ServiceCategory, int>(_Context));
         public IGenericRepository<ServiceCategory, int> ServiceCategoryRepository => _ServicRepo.Value;
+
+        private readonly Lazy<IGenericRepository<Order, int>> _OrderRepo =
+           new(() => new GenericRepository<Order, int>(_Context));
+        public IGenericRepository<Order, int> OrderRepo => _OrderRepo.Value;
+
         public Task<int> SaveAsync() => _Context.SaveChangesAsync();
         public async Task<IDbContextTransaction> BeginTransactionAsync()
         {

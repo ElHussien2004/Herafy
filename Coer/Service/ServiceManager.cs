@@ -4,6 +4,7 @@ using Domain.Entities.UsersEntity;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using ServiceAbstraction;
 using StackExchange.Redis;
 using System;
@@ -17,7 +18,7 @@ namespace Service
     public class ServiceManager(IConfiguration configuration,IUnitOfWork unitOfWork,IFileService fileService,IMapper mapper
         ,IConnectionMultiplexer connection,ISMSService sMS,UserManager<ApplicationUser> userManager,
         IWebHostEnvironment environment,
-        RoleManager<IdentityRole> roleManager) : IServiceManager
+        RoleManager<IdentityRole> roleManager, ILogger<OrderService> _logger) : IServiceManager
     {
         private readonly Lazy<ISMSService> _LazysmsService = new Lazy<ISMSService>(() => new SMSService(configuration));
         public ISMSService SMSService =>_LazysmsService.Value;
@@ -35,5 +36,8 @@ namespace Service
         private readonly Lazy<IClientService> _LazyClientService = new Lazy<IClientService>(() => new ClientService(userManager,roleManager,mapper,unitOfWork,fileService));
 
         public IClientService ClientService => _LazyClientService.Value;
+        private readonly Lazy<IOrderService> _LazyOrderService = new Lazy<IOrderService>(() => new OrderService(unitOfWork, mapper,_logger,fileService));
+
+        public IOrderService OrderService => _LazyOrderService.Value;
     }
 }
