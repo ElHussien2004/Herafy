@@ -20,6 +20,7 @@ namespace Domain.Contracts
         public IGenericRepository<TechnicianDocument, string> DocumentRepository { get; }
         public IGenericRepository<ServiceCategory, int> ServiceCategoryRepository { get; }
         public IGenericRepository<Order , int> OrderRepo { get; }
+        public IGenericRepository<Review, int> ReviewRepo { get; }
         Task<IDbContextTransaction> BeginTransactionAsync();
         Task<int> SaveAsync();
 

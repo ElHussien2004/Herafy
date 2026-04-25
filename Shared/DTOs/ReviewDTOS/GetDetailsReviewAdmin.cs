@@ -1,25 +1,20 @@
-﻿using Domain.Entities.UsersEntity;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Domain.Entities.OrderEntity
+namespace Shared.DTOs.ReviewDTOS
 {
-    public class Review : BaseEntity<int>
+    public class GetDetailsReviewAdmin
     {
-        #region Relation Order
-        public int OrderId { get; set; } //FK
+        public int Id { get; set; }
+        public string NameClient { get; set; }
 
-        public Order Order { get; set; }
-        #endregion
-
-
+        public string NameTechnician { get; set; }
         public int Rating { get; set; }//1--5
 
         public string? Comment { get; set; }
-
         public DateTime CreatedAt { get; set; }
         public bool is_suspicious { get; set; } // AI هيرجع true لو التقييم مشبوه
         public float ConfidenceScore { get; set; } // نسبة تأكد الـ AI من قراره

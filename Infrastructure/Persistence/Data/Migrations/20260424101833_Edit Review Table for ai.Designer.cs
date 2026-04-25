@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Persistence.Data;
 
@@ -11,9 +12,11 @@ using Persistence.Data;
 namespace Persistence.Data.Migrations
 {
     [DbContext(typeof(HerafyDbContext))]
-    partial class HerafyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260424101833_Edit Review Table for ai")]
+    partial class EditReviewTableforai
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -50,7 +53,7 @@ namespace Persistence.Data.Migrations
                     b.HasIndex("ClientId", "TechnicianId")
                         .IsUnique();
 
-                    b.ToTable("Chats", (string)null);
+                    b.ToTable("Chats");
                 });
 
             modelBuilder.Entity("Domain.Entities.Communications.Message", b =>
@@ -99,7 +102,7 @@ namespace Persistence.Data.Migrations
 
                     b.HasIndex("SenderId");
 
-                    b.ToTable("Messages", (string)null);
+                    b.ToTable("Messages");
                 });
 
             modelBuilder.Entity("Domain.Entities.Communications.Notification", b =>
@@ -142,7 +145,7 @@ namespace Persistence.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Notifications", (string)null);
+                    b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("Domain.Entities.OrderEntity.Order", b =>
@@ -214,7 +217,7 @@ namespace Persistence.Data.Migrations
 
                     b.HasIndex("TechnicianId");
 
-                    b.ToTable("Orders", (string)null);
+                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("Domain.Entities.OrderEntity.Review", b =>
@@ -237,8 +240,8 @@ namespace Persistence.Data.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETDATE()");
 
-                    b.Property<string>("FraudReasons")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<bool>("IsFlagged")
+                        .HasColumnType("bit");
 
                     b.Property<int>("OrderId")
                         .HasColumnType("int");
@@ -246,15 +249,12 @@ namespace Persistence.Data.Migrations
                     b.Property<int>("Rating")
                         .HasColumnType("int");
 
-                    b.Property<bool>("is_suspicious")
-                        .HasColumnType("bit");
-
                     b.HasKey("Id");
 
                     b.HasIndex("OrderId")
                         .IsUnique();
 
-                    b.ToTable("Reviews", (string)null);
+                    b.ToTable("Reviews");
                 });
 
             modelBuilder.Entity("Domain.Entities.ServiceEntity.ServiceCategory", b =>
@@ -271,7 +271,7 @@ namespace Persistence.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ServiceCategories", (string)null);
+                    b.ToTable("ServiceCategories");
                 });
 
             modelBuilder.Entity("Domain.Entities.UsersEntity.ApplicationUser", b =>
@@ -387,7 +387,7 @@ namespace Persistence.Data.Migrations
                     b.HasIndex("Id")
                         .IsUnique();
 
-                    b.ToTable("Clients", (string)null);
+                    b.ToTable("Clients");
                 });
 
             modelBuilder.Entity("Domain.Entities.UsersEntity.Technician", b =>
@@ -453,7 +453,7 @@ namespace Persistence.Data.Migrations
 
                     b.HasIndex("ServiceCategoryId");
 
-                    b.ToTable("Technicians", (string)null);
+                    b.ToTable("Technicians");
                 });
 
             modelBuilder.Entity("Domain.Entities.UsersEntity.TechnicianDocument", b =>
@@ -476,7 +476,7 @@ namespace Persistence.Data.Migrations
 
                     b.HasKey("TechnicianId");
 
-                    b.ToTable("Documents", (string)null);
+                    b.ToTable("Documents");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

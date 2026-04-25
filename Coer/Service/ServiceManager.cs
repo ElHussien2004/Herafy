@@ -18,7 +18,7 @@ namespace Service
     public class ServiceManager(IConfiguration configuration,IUnitOfWork unitOfWork,IFileService fileService,IMapper mapper
         ,IConnectionMultiplexer connection,ISMSService sMS,UserManager<ApplicationUser> userManager,
         IWebHostEnvironment environment,
-        RoleManager<IdentityRole> roleManager, ILogger<OrderService> _logger) : IServiceManager
+        RoleManager<IdentityRole> roleManager, ILogger<OrderService> _logger, IHttpClientFactory _httpClientFactory) : IServiceManager
     {
         private readonly Lazy<ISMSService> _LazysmsService = new Lazy<ISMSService>(() => new SMSService(configuration));
         public ISMSService SMSService =>_LazysmsService.Value;
@@ -39,5 +39,8 @@ namespace Service
         private readonly Lazy<IOrderService> _LazyOrderService = new Lazy<IOrderService>(() => new OrderService(unitOfWork, mapper,_logger,fileService));
 
         public IOrderService OrderService => _LazyOrderService.Value;
+        private readonly Lazy<IReviewService> _LazyReviewService = new Lazy<IReviewService>(() => new ReviewService(unitOfWork,_httpClientFactory,configuration,mapper));
+
+        public IReviewService ReviewService => _LazyReviewService.Value;
     }
 }
