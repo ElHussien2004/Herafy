@@ -17,6 +17,7 @@ namespace Shared.DTOs.ReviewDTOS
     {
         public bool is_suspicious { get;set; }
         public float confidence_score { get; set; }
-        public string? FraudReasons { get; set; }
+        public string status { get; set; }
+        public string? reasons { get; set; }
     }
 }

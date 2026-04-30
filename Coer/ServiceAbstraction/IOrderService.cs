@@ -31,5 +31,7 @@ namespace ServiceAbstraction
         Task<Result<int>>CountOrderTechnicianAsync(string TechnicianId);
         Task<Result<int>> CountOrderClientAsync(string clientId);
         Task<Result<int>> CountOrdersCompleted();
+
+        Task<Result<decimal>> TotalPriceUser(string userid,bool IsTec);
     }
 }

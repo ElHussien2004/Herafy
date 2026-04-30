@@ -18,28 +18,25 @@ namespace Service.Specifications
             AddInclude(x => x.Technician);
         }
 
-        
+
         public OrderWithDetailsSpecification(OrderQuery query)
-           : base(x =>
-            (string.IsNullOrEmpty(query.ClintId) || x.ClientId == query.ClintId) &&
-
-            (string.IsNullOrEmpty(query.TechnicianId) || x.TechnicianId == query.TechnicianId) &&
-
-            (string.IsNullOrEmpty(query.NameClient) || x.Client.User.FullName.Contains(query.NameClient)) &&
-
-            (string.IsNullOrEmpty(query.NameTechnician) || x.Technician.User.FullName.Contains(query.NameTechnician)) &&
-
-            (!query.OrderId.HasValue || x.Id == query.OrderId) &&
-
-           (!query.State.HasValue || x.Status == query.State)
-        )
+            : base(x =>
+             (string.IsNullOrEmpty(query.ClintId) || x.ClientId == query.ClintId) &&
+             (string.IsNullOrEmpty(query.TechnicianId) || x.TechnicianId == query.TechnicianId) &&
+             // حماية ضد الـ Null هنا
+             (string.IsNullOrEmpty(query.NameClient) || (x.Client != null && x.Client.User != null && x.Client.User.FullName.Contains(query.NameClient))) &&
+             (string.IsNullOrEmpty(query.NameTechnician) || (x.Technician != null && x.Technician.User != null && x.Technician.User.FullName.Contains(query.NameTechnician))) &&
+             (!query.OrderId.HasValue || x.Id == query.OrderId) &&
+             (!query.State.HasValue || x.Status == query.State)
+         )
         {
             AddInclude(x => x.ServiceCategory);
             AddInclude(x => x.Client);
+            AddInclude(x => x.Client.User);
             AddInclude(x => x.Technician);
-            
+            AddInclude(x => x.Technician.User); 
         }
 
-        
+
     }
 }

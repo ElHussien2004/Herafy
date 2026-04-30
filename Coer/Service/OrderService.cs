@@ -390,5 +390,44 @@ namespace Service
                 return Error.Failure("خطأ_نظام", "حدث خطأ أثناء جلب طلبات الفني.");
             }
         }
+
+        public async Task<Result<decimal>> TotalPriceUser(string userid,bool IsTec)
+        {
+           decimal totalPrice = 0;
+          if(IsTec)
+          {
+                var OrderSpac = new OrderQuery()
+                {
+                    TechnicianId = userid,
+                    State = State.Completed
+                };
+
+                var spec = new OrderWithDetailsSpecification(OrderSpac);
+                var orders = await _unitOfWork.OrderRepo.GetAllAsync(spec);
+                
+                foreach (var order in orders)
+                {
+                    totalPrice += order.FinalPrice;
+                }  
+          }
+          else
+          {
+                var OrderSpac = new OrderQuery()
+                {
+                    ClintId = userid,
+                    State = State.Completed
+                };
+                
+                var spec = new OrderWithDetailsSpecification(OrderSpac);
+                var orders = await _unitOfWork.OrderRepo.GetAllAsync(spec);
+                foreach (var order in orders)
+                {
+                    totalPrice += order.FinalPrice;
+                }
+            }
+
+          return Result<decimal>.Ok(totalPrice);
+           
+        }
     }
 }

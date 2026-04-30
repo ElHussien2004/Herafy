@@ -126,7 +126,7 @@ namespace Service
                     }
                     isNew= true;
                 }
-
+                await userManager.AddToRoleAsync(user, userType.ToString());
                 // 5. إنشاء التوكن وإرجاع النتيجة
                 var token = await CreateTokenAsync(user);
 

@@ -16,10 +16,14 @@ namespace ServiceAbstraction
         Task<Result<FraudCheckResponseDto>> CheckReviewFraudAsync(FraudCheckRequestDto request);
         Task<Result<IEnumerable<GetTechnicianReviews>>> GetReviewsByTechnicianIdAsync(string technicianId);
 
-        Task<Result<IEnumerable<GetAllReviewsDTO>>> GetAll();
+        Task<Result<IEnumerable<GetDetailsReviewAdmin>>> GetAll();
         Task<Result<GetDetailsReviewAdmin>>GetDetailsReviewAdmin(int IdReview);
 
         Task<Result>DeleteReview(int IdReview);
 
+        Task<Result>ApprovedReview(int IdReview);
+
+        Task<Result<int>> Count_IsApproved();
+        Task<Result<int>> Count_Is_Suspicious();
     }
 }

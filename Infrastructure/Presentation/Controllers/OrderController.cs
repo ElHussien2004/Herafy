@@ -65,10 +65,10 @@ namespace Presentation.Controllers
         }
         //-6
         [Authorize(Roles = Roles.Technician)]
-        [HttpGet("{orderId:int}/CompleteOrder")]
-        public async Task<IActionResult> CompleteOrder(int orderId,[FromBody]IFormFile WorkImage)
+        [HttpPost("{orderId:int}/CompleteOrder")]
+        public async Task<IActionResult> CompleteOrder(int orderId,[FromForm] CompleteOrderDto WorkImage)
         {
-            var result = await _serviceManager.OrderService.CompleteOrder(orderId, WorkImage);
+            var result = await _serviceManager.OrderService.CompleteOrder(orderId, WorkImage.WorkImage);
             return HandleResult(result);
         }
         //-8
@@ -89,7 +89,7 @@ namespace Presentation.Controllers
         }
         //-4
         [Authorize(Roles = Roles.Technician)]
-        [HttpGet("GetTechnicianOrders/{techId}/{State}\")")]
+        [HttpGet("GetTechnicianOrders")]
         public async Task<ActionResult<IEnumerable<GetTechnicianOrder>>> GetTechnicianOrders([FromQuery] string techId, [FromQuery] State state)
         {
             var result = await _serviceManager.OrderService.GetTechnicianOrders(techId, state);
@@ -101,6 +101,21 @@ namespace Presentation.Controllers
         public async Task<ActionResult<int>> GetCompletedCount()
         {
             var result = await _serviceManager.OrderService.CountOrdersCompleted();
+            return HandleResult(result);
+        }
+
+        [HttpGet("TotalPayments")]
+        [Authorize(Roles = Roles.Technician)]
+        public async Task<ActionResult<decimal>> GetTotalPriceTech([FromQuery] string UserId)
+        {
+            var result = await _serviceManager.OrderService.TotalPriceUser(UserId, true);
+            return HandleResult(result);
+        }
+        [HttpGet("TotalProfits")]
+        [Authorize(Roles = Roles.Admin)]
+        public async Task<ActionResult<decimal>> GetTotalPriceClient([FromQuery]string UserId)
+        {
+            var result = await _serviceManager.OrderService.TotalPriceUser(UserId, false);
             return HandleResult(result);
         }
     }

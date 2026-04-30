@@ -38,8 +38,9 @@ namespace Presentation.Controllers
             return HandleResult<IEnumerable<TechnicianDto>>(result);
         }
        
-        [Authorize(Roles = Roles.Technician)]
+        
         [HttpPost("AddTechnician")]
+        [Authorize(Roles = "Technician")]
         public async Task<IActionResult> AddTechnician([FromForm] AddTechnicianDto technicianDto)
         {
             var result = await _serviceManager.TechnicianService.AddAsync(GetUserId(),technicianDto);

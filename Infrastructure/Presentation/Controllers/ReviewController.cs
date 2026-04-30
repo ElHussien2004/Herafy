@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Domain.Entities.OrderEntity;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ServiceAbstraction;
 using Shared;
@@ -13,7 +14,7 @@ namespace Presentation.Controllers
 {
     public class ReviewController(IServiceManager  serviceManager):ApiBaseController
     {
-        [HttpPost("CreateOrder")]
+        [HttpPost("CreateReview")]
         [Authorize(Roles =Roles.Client)] 
         public async Task<IActionResult> Create(CreateReviewDTO reviewDto)
         {
@@ -30,7 +31,7 @@ namespace Presentation.Controllers
         }
         [HttpGet("GetAllReviews")]
         [Authorize(Roles = Roles.Admin)] 
-        public async Task<ActionResult<IEnumerable<GetAllReviewsDTO>>> GetAllReviews()
+        public async Task<ActionResult<IEnumerable<GetDetailsReviewAdmin>>> GetAllReviews()
         {
             var result = await serviceManager.ReviewService.GetAll();
             return HandleResult(result);
@@ -47,6 +48,28 @@ namespace Presentation.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var result = await serviceManager.ReviewService.DeleteReview(id);
+            return HandleResult(result);
+        }
+        [HttpPatch("ApprovedReview/{ReviewId}")]
+        [Authorize(Roles=Roles.Admin)]
+        public async Task<IActionResult>ActionREview(int ReviewId)
+        {
+            var result = await serviceManager.ReviewService.ApprovedReview(ReviewId);
+            return HandleResult(result);
+        }
+
+        [Authorize(Roles = Roles.Admin)]
+        [HttpGet("GetCountApproved")]
+        public async Task<ActionResult<int>>CountApproved()
+        {
+            var result = await serviceManager.ReviewService.Count_IsApproved();
+            return HandleResult(result);
+        }
+        [Authorize(Roles = Roles.Admin)]
+        [HttpGet("GetCountIs_Suspicious")]
+        public async Task<ActionResult<int>> CountIs_Suspicious()
+        {
+            var result = await serviceManager.ReviewService.Count_Is_Suspicious();
             return HandleResult(result);
         }
     }

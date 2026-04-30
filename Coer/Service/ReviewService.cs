@@ -14,6 +14,7 @@ using System.Linq;
 using System.Net.Http.Json;
 using System.Text;
 using System.Threading.Tasks;
+using Twilio.Annotations;
 
 namespace Service
 {
@@ -25,12 +26,14 @@ namespace Service
         {
             var SpacRev = new ReviewSpecification(technicianId);
             var TechRevs = await _unitOfWork.ReviewRepo.GetAllAsync(SpacRev);
-            if(TechRevs.Any())
+            if (!TechRevs.Any())
             {
-                return Result<float>.Ok(0);
+                return Result<float>.Ok(newRating);
             }
             var averageRating = (float)TechRevs.Average(r => r.Rating);
+
             float deviation = Math.Abs(newRating - averageRating);
+
             return Result<float>.Ok(deviation);
         }
 
@@ -95,10 +98,12 @@ namespace Service
                     Comment = review.Comment,
                     CreatedAt = DateTime.Now, 
                     is_suspicious = aiResult.IsSuccess && (aiResult.Value?.is_suspicious ?? false),
-
-                    FraudReasons = aiResult.IsSuccess && aiResult.Value?.FraudReasons != null
-                                   ? string.Join(", ", aiResult.Value.FraudReasons)
+                    IsApproved= !(aiResult.IsSuccess && (aiResult.Value?.is_suspicious ?? false)),
+                    FraudReasons = aiResult.IsSuccess && aiResult.Value?.reasons != null
+                                   ? string.Join(", ", aiResult.Value.reasons)
                                    : "No suspicion detected or AI service unavailable"
+                                   ,
+                    ConfidenceScore=aiResult.Value?.confidence_score??0
                 };
                 await _unitOfWork.ReviewRepo.AddAsync(rev);
 
@@ -159,7 +164,7 @@ namespace Service
                 return Error.Failure("خطأ غير متوقع", ex.Message);
             }
         }
-        public async Task<Result<IEnumerable<GetAllReviewsDTO>>> GetAll()
+        public async Task<Result<IEnumerable<GetDetailsReviewAdmin>>> GetAll()
         {
             try
             {
@@ -168,10 +173,10 @@ namespace Service
                 var reviews = await _unitOfWork.ReviewRepo.GetAllAsync(spec);
 
                 if (reviews == null)
-                    return Result<IEnumerable<GetAllReviewsDTO>>.Ok(new List<GetAllReviewsDTO>());
+                    return Result<IEnumerable<GetDetailsReviewAdmin>>.Ok(new List<GetDetailsReviewAdmin>());
 
-                var mappedReviews = _mapper.Map<IEnumerable<GetAllReviewsDTO>>(reviews);
-                return Result<IEnumerable<GetAllReviewsDTO>>.Ok(mappedReviews);
+                var mappedReviews = _mapper.Map<IEnumerable<GetDetailsReviewAdmin>>(reviews);
+                return Result<IEnumerable<GetDetailsReviewAdmin>>.Ok(mappedReviews);
             }
             catch (Exception ex)
             {
@@ -198,6 +203,43 @@ namespace Service
             }
         }
 
+        public async Task<Result> ApprovedReview(int IdReview)
+        {
+            try
+            {
+                var spec = new ReviewSpecification(IdReview);
+                var review = await _unitOfWork.ReviewRepo.GetByIdAsync(spec);
 
+                if (review == null)
+                    return Error.NotFound("التقييم غير موجود", "لا يمكن اعتماد تقييم غير موجود.");
+
+                review.IsApproved = true;
+                _unitOfWork.ReviewRepo.Update(review);
+                var result = await _unitOfWork.SaveAsync();
+
+                if (result <= 0)
+                    return Error.Failure("فشل الحذف", "حدث خطأ أثناء محاولة اعتماد التقييم من قاعدة البيانات.");
+
+                return Result.Ok();
+            }
+            catch (Exception ex)
+            {
+                return Error.Failure("خطأ غير متوقع", ex.Message);
+            }
+        }
+
+        public async Task<Result<int>> Count_IsApproved()
+        {
+            var spec = new ReviewSpecification(true);
+            var coutRev = await _unitOfWork.ReviewRepo.CountAsync(spec);
+            return Result<int>.Ok(coutRev);
+        }
+
+        public async Task<Result<int>> Count_Is_Suspicious()
+        {
+            var spec = new ReviewSpecification();
+            var coutRev = await _unitOfWork.ReviewRepo.CountAsync(spec);
+            return Result<int>.Ok(coutRev);
+        }
     }
 }

@@ -19,7 +19,7 @@ namespace Domain.Entities.OrderEntity
         public int Rating { get; set; }//1--5
 
         public string? Comment { get; set; }
-
+        public bool IsApproved { get; set; }
         public DateTime CreatedAt { get; set; }
         public bool is_suspicious { get; set; } // AI هيرجع true لو التقييم مشبوه
         public float ConfidenceScore { get; set; } // نسبة تأكد الـ AI من قراره
