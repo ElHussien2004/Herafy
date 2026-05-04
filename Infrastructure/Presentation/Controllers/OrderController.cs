@@ -80,7 +80,7 @@ namespace Presentation.Controllers
             return HandleResult(result);
         }
         //3
-        [Authorize(Roles = Roles.Client)]
+        [Authorize(Roles = Roles.Client + "," +Roles.Admin)]
         [HttpGet("GetClientOrders/{clientId}/{State}")]
         public async Task<ActionResult<IEnumerable<GetClientOrderDTO>>> GetClientOrders([FromQuery] string clientId, [FromQuery] State state)
         {
@@ -88,7 +88,7 @@ namespace Presentation.Controllers
             return HandleResult(result);
         }
         //-4
-        [Authorize(Roles = Roles.Technician)]
+        [Authorize(Roles = Roles.Technician + "," + Roles.Admin)]
         [HttpGet("GetTechnicianOrders")]
         public async Task<ActionResult<IEnumerable<GetTechnicianOrder>>> GetTechnicianOrders([FromQuery] string techId, [FromQuery] State state)
         {

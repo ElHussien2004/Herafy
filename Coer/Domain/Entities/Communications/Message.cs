@@ -20,10 +20,8 @@ namespace Domain.Entities.Communications
 
         public MessageType Type { get; set; }
 
-        public string ImageUrl { get; set; }
-
         public bool IsRead { get; set; }
-
+        public bool IsDeleted { get; set; }
         public DateTime SentAt { get; set; }
     }
 }

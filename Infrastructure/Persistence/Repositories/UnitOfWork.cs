@@ -1,4 +1,5 @@
 ﻿using Domain.Contracts;
+using Domain.Entities.Communications;
 using Domain.Entities.OrderEntity;
 using Domain.Entities.ServiceEntity;
 using Domain.Entities.UsersEntity;
@@ -38,6 +39,13 @@ namespace Persistence.Repositories
         private readonly Lazy<IGenericRepository<Review, int>> _ReviewRepo =
           new(() => new GenericRepository<Review, int>(_Context));
         public IGenericRepository<Review, int> ReviewRepo => _ReviewRepo.Value;
+
+        private readonly Lazy<IGenericRepository<Chat, int>> _chatRepo =
+          new(() => new GenericRepository<Chat, int>(_Context));
+        public IGenericRepository<Chat, int> ChatRepo => _chatRepo.Value;
+        private readonly Lazy<IGenericRepository<Message, int>> _MessageRepo =
+          new(() => new GenericRepository<Message, int>(_Context));
+        public IGenericRepository<Message, int> MessageRepo => _MessageRepo.Value;
 
         public Task<int> SaveAsync() => _Context.SaveChangesAsync();
         public async Task<IDbContextTransaction> BeginTransactionAsync()

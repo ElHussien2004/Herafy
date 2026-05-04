@@ -15,7 +15,9 @@ namespace Service.Specifications
         {
             AddInclude(x => x.ServiceCategory);
             AddInclude(x => x.Client);
+            AddInclude(x => x.Client.User);
             AddInclude(x => x.Technician);
+            AddInclude(x => x.Technician.User);
         }
 
 

@@ -17,9 +17,18 @@ namespace Service.Specifications
         public Expression<Func<TEntity, bool>>? Criteria { get; private set; }
 
         public List<Expression<Func<TEntity, object>>> IncludeExpressions { get; } = [];
+        // Pagination Properties
+        public int Take { get; private set; }
+        public int Skip { get; private set; }
+        public bool IsPagingEnabled { get; private set; }
 
-
-
+        // الميثود اللي هتستخدمها في الـ Specification الخاصة بالرسايل
+        protected void ApplyPaging(int skip, int take)
+        {
+            Skip = skip;
+            Take = take;
+            IsPagingEnabled = true;
+        }
         protected void AddInclude(Expression<Func<TEntity, object>> expression)
         {
             IncludeExpressions.Add(expression);

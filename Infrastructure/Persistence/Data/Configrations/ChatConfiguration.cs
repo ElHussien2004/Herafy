@@ -16,17 +16,17 @@ namespace Persistence.Data.Configrations
             builder.HasKey(x => x.Id);
 
             builder.Property(x => x.LastMessageAt)
-                   .HasDefaultValueSql("GETDATE()");
+                .HasDefaultValueSql("GETDATE()");
 
-            // Client Relation
+            // علاقة العميل (Client)
             builder.HasOne(x => x.Client)
-                   .WithMany(c => c.Chats)
+                   .WithMany(c => c.Chats) 
                    .HasForeignKey(x => x.ClientId)
                    .OnDelete(DeleteBehavior.Restrict);
 
-            // Technician Relation
+            // علاقة الفني (Technician)
             builder.HasOne(x => x.Technician)
-                   .WithMany(t => t.Chats)
+                   .WithMany(t => t.Chats) 
                    .HasForeignKey(x => x.TechnicianId)
                    .OnDelete(DeleteBehavior.Restrict);
 
@@ -36,7 +36,7 @@ namespace Persistence.Data.Configrations
                    .HasForeignKey(m => m.ChatId)
                    .OnDelete(DeleteBehavior.Cascade);
 
-            //   علشان ميكونش فيه شات مكرر
+            // Index لضمان عدم تكرار شات بين نفس الفني والعميل
             builder.HasIndex(x => new { x.ClientId, x.TechnicianId })
                    .IsUnique();
         }

@@ -16,12 +16,8 @@ namespace Persistence.Data.Configrations
             builder.HasKey(x => x.Id);
 
             builder.Property(x => x.Content)
-                   .HasMaxLength(2000);
+                   .HasMaxLength(4000);
 
-          
-            builder.Property(x => x.ImageUrl)
-                   .HasMaxLength(500)
-                   .IsRequired(false);
 
             builder.Property(x => x.SentAt)
                    .HasDefaultValueSql("GETDATE()");
@@ -30,22 +26,21 @@ namespace Persistence.Data.Configrations
                    .HasDefaultValue(false);
 
             builder.Property(x => x.Type)
-                   .HasDefaultValue(MessageType.Text)
-                   .IsRequired()
-                   .HasMaxLength(20);
-            // Chat relation
-            builder.HasOne(x => x.Chat)
-                   .WithMany(c => c.Messages)
-                   .HasForeignKey(x => x.ChatId)
-                   .OnDelete(DeleteBehavior.Cascade);
+                .HasConversion<string>()
+                .HasMaxLength(20);
 
-            // Sender relation
+            builder.HasOne(x => x.Chat)
+                 .WithMany(c => c.Messages)
+                 .HasForeignKey(x => x.ChatId)
+                 .OnDelete(DeleteBehavior.Cascade);
+
             builder.HasOne(x => x.Sender)
                    .WithMany()
                    .HasForeignKey(x => x.SenderId)
                    .OnDelete(DeleteBehavior.Restrict);
 
-            builder.HasIndex(x => x.ChatId);
+            // Performance: أهم Index لجلب تاريخ الشات (History)
+            builder.HasIndex(x => new { x.ChatId, x.SentAt });
         }
     }
 }

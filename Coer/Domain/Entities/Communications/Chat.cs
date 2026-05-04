@@ -15,6 +15,7 @@ namespace Domain.Entities.Communications
         public string TechnicianId { get; set; }
         public Technician Technician { get; set; }
         public DateTime LastMessageAt { get; set; }
+        public string LastMessageContent { get; set; }
         public ICollection<Message> Messages { get; set; }
     }
 }

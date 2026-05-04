@@ -1,4 +1,5 @@
 ﻿using Domain.Entities;
+using Domain.Entities.Communications;
 using Domain.Entities.OrderEntity;
 using Domain.Entities.ServiceEntity;
 using Domain.Entities.UsersEntity;
@@ -21,6 +22,8 @@ namespace Domain.Contracts
         public IGenericRepository<ServiceCategory, int> ServiceCategoryRepository { get; }
         public IGenericRepository<Order , int> OrderRepo { get; }
         public IGenericRepository<Review, int> ReviewRepo { get; }
+        public IGenericRepository<Chat,int>ChatRepo { get; }
+        public IGenericRepository<Message,int>MessageRepo { get; }
         Task<IDbContextTransaction> BeginTransactionAsync();
         Task<int> SaveAsync();
 

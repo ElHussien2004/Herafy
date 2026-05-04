@@ -7,6 +7,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Persistence
 {
@@ -27,6 +28,10 @@ namespace Persistence
             if (specifications.OrderByDescending is not null)
             {
                 Query = Query.OrderByDescending(specifications.OrderByDescending);
+            }
+            if (specifications.IsPagingEnabled)
+            {
+                Query = Query.Skip(specifications.Skip).Take(specifications.Take);
             }
 
             if (specifications.IncludeExpressions?.Any() == true)

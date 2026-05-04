@@ -29,7 +29,7 @@ namespace Presentation.Controllers
             var result = await _serviceManager.TechnicianService.GetByIdAsync(GetUserId());
             return  HandleResult(result);
         }
-        [Authorize(Roles = Roles.Admin + "," + Roles.Technician)]
+        [Authorize(Roles = Roles.Admin + "," + Roles.Technician + ","+Roles.Client)]
         [HttpGet("GetAllTechnicians")]
         public async Task<ActionResult<IEnumerable<TechnicianDto>>> GetAll([FromQuery] TechnicianQuery query)
         {
