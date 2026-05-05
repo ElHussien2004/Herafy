@@ -17,8 +17,9 @@ namespace Domain.Entities.UsersEntity
 
         public DateTime CreatedAt { get; set; }
 
-        public Client Client { get; set; }
+        public Client? Client { get; set; }
 
-        public Technician Technician { get; set; }
+        public Technician? Technician { get; set; }
+        public UserDocument? Document { get; set; }
     }
 }

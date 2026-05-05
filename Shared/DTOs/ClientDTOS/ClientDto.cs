@@ -14,7 +14,7 @@ namespace Shared.DTOs.ClientDTOS
         public string? ProfileImageURL { get; set; }
         public string City { get; set; }
         public string Government { get; set; }
-        public bool IsActive { get; set; }
+        public string State { get; set; }
         public DateTime CreatedAt { get; set; }
         public int NumberOfOrder { get; set; }
         public double Latitude { get; set; }

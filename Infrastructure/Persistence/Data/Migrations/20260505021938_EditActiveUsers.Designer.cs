@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Persistence.Data;
 
@@ -11,9 +12,11 @@ using Persistence.Data;
 namespace Persistence.Data.Migrations
 {
     [DbContext(typeof(HerafyDbContext))]
-    partial class HerafyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260505021938_EditActiveUsers")]
+    partial class EditActiveUsers
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -372,6 +375,7 @@ namespace Persistence.Data.Migrations
                         .HasDefaultValueSql("GETDATE()");
 
                     b.Property<string>("DocumentUserId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Government")
@@ -428,6 +432,7 @@ namespace Persistence.Data.Migrations
                         .HasDefaultValueSql("GETDATE()");
 
                     b.Property<string>("DocumentUserId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("ExperienceYears")
@@ -627,7 +632,9 @@ namespace Persistence.Data.Migrations
                 {
                     b.HasOne("Domain.Entities.UsersEntity.UserDocument", "Document")
                         .WithMany()
-                        .HasForeignKey("DocumentUserId");
+                        .HasForeignKey("DocumentUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Domain.Entities.UsersEntity.ApplicationUser", "User")
                         .WithOne("Client")
@@ -644,7 +651,9 @@ namespace Persistence.Data.Migrations
                 {
                     b.HasOne("Domain.Entities.UsersEntity.UserDocument", "Document")
                         .WithMany()
-                        .HasForeignKey("DocumentUserId");
+                        .HasForeignKey("DocumentUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Domain.Entities.UsersEntity.ApplicationUser", "User")
                         .WithOne("Technician")

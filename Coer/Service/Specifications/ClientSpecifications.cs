@@ -22,5 +22,11 @@ namespace Service.Specifications
                    AddInclude(c => c.User);
                    AddInclude(c => c.Orders);
          }
+        public ClientSpecifications()
+            : base(null)
+        {
+            AddInclude(c => c.User);
+            AddInclude(c => c.Orders);
+        }
     }
 }

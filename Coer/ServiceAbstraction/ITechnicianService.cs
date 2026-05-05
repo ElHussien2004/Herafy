@@ -14,6 +14,8 @@ namespace ServiceAbstraction
     public interface ITechnicianService
     {
         Task<Result<IEnumerable<TechnicianDto>>> GetAllAsync(TechnicianQuery ParamsQuery);
+        Task<Result<IEnumerable<TechnicianDto>>> GetAllAdminAsync();
+
         Task<Result<IEnumerable<ServiceDto>>>GetAllService();
         Task<Result<TechniciaDetailsDto>> GetByIdAsync(string id);
         Task<Result> AddAsync(string Id,AddTechnicianDto technician);
@@ -22,7 +24,7 @@ namespace ServiceAbstraction
         public Task<Result<int>> CountAsync();
         Task<Result<bool>> UploadDocumentsAsync(string technicianId, UploadDocumentsDto documents);
         Task<Result<bool>> ToggleAvailabilityStatusAsync(string technicianId, bool isAvailable);
-        Task<Result<bool>> ChangeIsActive(string id, bool State);
+        Task<Result<bool>> ChangeIsActive(string id, StateUser state);
 
         Task<Result<GetDocumentDto>> GetDocument(string id);
 

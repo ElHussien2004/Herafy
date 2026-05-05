@@ -1,4 +1,5 @@
-﻿using Shared.CommonResult;
+﻿using Domain.Entities.UsersEntity;
+using Shared.CommonResult;
 using Shared.DTOs.ClientDTOS;
 using Shared.DTOs.TechnicianDTOS;
 using System;
@@ -11,14 +12,16 @@ namespace ServiceAbstraction
 {
    public interface IClientService
     {
-        Task<Result<IEnumerable<ClientDto>>> GetAllAsync(string? search);
+        Task<Result<IEnumerable<ClientDto>>> GetAllAsync();
         public Task<Result<int>> CountAsync();
         Task<Result> UpdateAsync(string id, UpdataClientdto dto);
-        public Task<Result<bool>> ChangeIsActive(string id, bool state);
+        public Task<Result<bool>> ChangeIsActive(string id, StateUser stateUser);
         
         Task<Result<ClientDetailsDto>> GetByIdAsync(string id);
         Task <Result> AddAsync(string Userid,AddClientDto clientDto);
        
         Task<Result<bool>> DeleteAsync(string id);
+        Task<Result<bool>> UploadDocumentsAsync(string ClientId, UploadDocumentsDto documents);
+        Task<Result<GetDecumentClient>> GetDocument(string id);
     }
 }

@@ -21,7 +21,8 @@ namespace Service.MappingProfiles
                     opt => opt.MapFrom(s => s.User != null ? s.User.FullName : null))
                 .ForMember(d => d.ProfileImageURL,
                     opt => opt.MapFrom<URLResolver<Technician, TechniciaDetailsDto>, string?>(
-                        s => s.User != null ? s.User.ProfileImageURL : null));
+                        s => s.User != null ? s.User.ProfileImageURL : null))
+                .ForMember(des=>des.State,sr=>sr.MapFrom(s=>s.State.ToString()));
 
             CreateMap<Technician, TechnicianDto>()
                 .ForMember(d => d.ServiceCategory,
@@ -32,12 +33,14 @@ namespace Service.MappingProfiles
                     opt => opt.MapFrom<URLResolver<Technician, TechnicianDto>, string?>(
                         s => s.User != null ? s.User.ProfileImageURL : null
                     ))
-                .ForMember(des=>des.UserId,sr=>sr.MapFrom(s=>s.Id));
+                .ForMember(des=>des.UserId,sr=>sr.MapFrom(s=>s.Id))
+                .ForMember(des=>des.Bio,sr=>sr.MapFrom(s=>s.Bio))
+                .ForMember(des=>des.State,sr=>sr.MapFrom(s=>s.State.ToString()));
 
             CreateMap< AddTechnicianDto,Technician>();
-             
 
-            CreateMap<Technician,GetDocumentDto>()
+
+            CreateMap<Technician, GetDocumentDto>()
                 .ForMember(d => d.ServiceCategory,
                     opt => opt.MapFrom(s => s.ServiceCategory != null ? s.ServiceCategory.Name : null))
                 .ForMember(d => d.FullName,
@@ -46,7 +49,8 @@ namespace Service.MappingProfiles
                     opt => opt.MapFrom<URLResolver<Technician, GetDocumentDto>, string?>(
                         s => s.User != null ? s.User.ProfileImageURL : null
                     ))
-                .ForMember(d=>d.PhoneNumber ,sr=>sr.MapFrom(s=>s.User.PhoneNumber))
+                .ForMember(d => d.PhoneNumber, sr => sr.MapFrom(s => s.User.PhoneNumber))
+                .ForMember(d => d.State, sr => sr.MapFrom(s => s.State.ToString()))
                 .ForMember(d => d.FaceImageUrl,
                     opt => opt.MapFrom<URLResolver<Technician, GetDocumentDto>, string?>(
                         s => s.Document != null ? s.Document.FaceImageUrl : null

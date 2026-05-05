@@ -6,16 +6,17 @@ using System.Threading.Tasks;
 
 namespace Domain.Entities.UsersEntity
 {
-    public class TechnicianDocument
+    public class UserDocument
     {
-        public string TechnicianId { get; set; } // [Fk + PK]
+        public string UserId { get; set; } // [Fk + PK]
         
-        public Technician Technician { get; set; }
+        public ApplicationUser User { get; set; }
 
         public string FaceImageUrl { get; set; }
 
         public string BackImageUrl { get; set; }
 
         public DateTime UploadedAt { get; set; }
+
     }
 }

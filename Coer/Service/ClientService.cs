@@ -139,10 +139,10 @@ namespace Service
             return Result<bool>.Ok(true);
         }
 
-        public async Task<Result<IEnumerable<ClientDto>>> GetAllAsync(string? Search)
+        public async Task<Result<IEnumerable<ClientDto>>> GetAllAsync()
         {
             
-            var sp = new ClientSpecifications(Search ,true);
+            var sp = new ClientSpecifications();
             var clients= await _unitOfWork.ClientRepository.GetAllAsync(sp);
 
             if (clients == null || !clients.Any())
@@ -210,7 +210,7 @@ namespace Service
             }
             return Result.Ok();
         }
-        public async Task<Result<bool>> ChangeIsActive(string id, bool state)
+        public async Task<Result<bool>> ChangeIsActive(string id, StateUser stateUser)
         {
             //get client 
             if (id == null)
@@ -223,7 +223,7 @@ namespace Service
                 return Error.NotFound("العميل غير موجود", $"لا يوجد العميل بالمعرف {id}");
             // is active false 
 
-            client.IsActive = state;
+            client.State = stateUser;
             // update 
             _unitOfWork.ClientRepository.Update(client);
             //save change
@@ -241,5 +241,70 @@ namespace Service
             //return Ok.Success();
             return Result<bool>.Ok(true);
         }
+
+       
+        public async  Task<Result<bool>> UploadDocumentsAsync(string ClientId, UploadDocumentsDto documents)
+        {
+            // 1. Validate input
+            if (string.IsNullOrWhiteSpace(ClientId) || documents == null)
+                return Error.Validation("بيانات غير صالحة", "يجب تقديم معرف الفني والوثائق");
+
+            if (documents.FaceImage == null || documents.BackImage == null)
+                return Error.Validation("ملفات غير مكتملة", "يجب رفع صورة الوجه وصورة الخلف");
+            var sp = new ClientSpecifications(ClientId);
+            // 2. Check technician
+            var client = await _unitOfWork.ClientRepository.GetByIdAsync(sp);
+
+            if (client == null)
+                return Error.NotFound("الفني غير موجود", $"لا يوجد فني بالمعرف {ClientId}");
+
+            // 3. Upload files
+            var saveReFace = await _fileService.SaveFileAsync(documents.FaceImage, "ClientDocuments");
+            if (!saveReFace.IsSuccess)
+                return Error.Failure("فشل عمليه الحفظ", "حدث غطأ في الملفات المرسلة  يرجو الرفع مره اخري");
+
+
+            var saveReBack = await _fileService.SaveFileAsync(documents.BackImage, "ClientDocuments");
+            if (!saveReBack.IsSuccess)
+                return Error.Failure("فشل عمليه الحفظ", "حدث غطأ في الملفات المرسلة  يرجو الرفع مره اخري");
+            ;
+
+            //Get User 
+            var user = await _userManager.FindByIdAsync(ClientId);
+            // 4. Create document
+            var document = new UserDocument
+            {
+                FaceImageUrl = saveReFace.Value,
+                BackImageUrl = saveReBack.Value,
+                UserId = ClientId,
+                User = user
+            };
+
+            await _unitOfWork.DocumentRepository.AddAsync(document);
+
+            // 5. Save changes
+            try
+            {
+                await _unitOfWork.SaveAsync();
+            }
+            catch
+            {
+                return Error.Failure("فشل حفظ البيانات", "حدث خطأ أثناء حفظ الوثائق");
+            }
+
+            return true;
+        }
+        public async Task<Result<GetDecumentClient>> GetDocument(string id)
+        {
+            var sp = new ClientSpecifications(id);
+            var client = await _unitOfWork.ClientRepository.GetByIdAsync(sp);
+            if (client == null)
+                return Error.NotFound("العميل غير موجود ", $"العميل {id} غير موجود  ");
+
+            var doc = _mapper.Map<GetDecumentClient>(client);
+
+            return Result<GetDecumentClient>.Ok(doc);
+        }
+
     }
 }

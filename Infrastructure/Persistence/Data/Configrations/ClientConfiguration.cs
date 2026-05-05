@@ -26,8 +26,8 @@ namespace Persistence.Data.Configrations
                   .HasDefaultValueSql("GETDATE()")
                   .ValueGeneratedOnAdd();
 
-            builder.Property(x => x.IsActive)
-                  .HasDefaultValue(true);
+            builder.Property(x => x.State)
+                   .HasDefaultValue(StateUser.Pending);
 
             builder.HasIndex(x => x.Id)
                    .IsUnique(); // One To One

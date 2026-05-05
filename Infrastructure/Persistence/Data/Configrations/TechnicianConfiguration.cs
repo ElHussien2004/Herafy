@@ -28,8 +28,8 @@ namespace Persistence.Data.Configrations
             builder.Property(x => x.RatingAvg)
                    .HasDefaultValue(0);
 
-            builder.Property(x => x.IsActive)
-                   .HasDefaultValue(false);
+            builder.Property(x => x.State)
+                   .HasDefaultValue(StateUser.Pending);
 
             builder.Property(x => x.CompletedJobs)
                    .HasDefaultValue(0);

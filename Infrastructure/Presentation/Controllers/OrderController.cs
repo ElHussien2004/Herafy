@@ -104,14 +104,14 @@ namespace Presentation.Controllers
             return HandleResult(result);
         }
 
-        [HttpGet("TotalPayments")]
+        [HttpGet("TotalProfits")]
         [Authorize(Roles = Roles.Technician)]
         public async Task<ActionResult<decimal>> GetTotalPriceTech([FromQuery] string UserId)
         {
             var result = await _serviceManager.OrderService.TotalPriceUser(UserId, true);
             return HandleResult(result);
         }
-        [HttpGet("TotalProfits")]
+        [HttpGet("TotalPayment")]
         [Authorize(Roles = Roles.Admin)]
         public async Task<ActionResult<decimal>> GetTotalPriceClient([FromQuery]string UserId)
         {

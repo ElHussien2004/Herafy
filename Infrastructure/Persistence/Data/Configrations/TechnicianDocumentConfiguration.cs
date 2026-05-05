@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 
 namespace Persistence.Data.Configrations
 {
-    public class TechnicianDocumentConfiguration : IEntityTypeConfiguration<TechnicianDocument>
+    public class TechnicianDocumentConfiguration : IEntityTypeConfiguration<UserDocument>
     {
-        public void Configure(EntityTypeBuilder<TechnicianDocument> builder)
+        public void Configure(EntityTypeBuilder<UserDocument> builder)
         {
-            builder.HasKey(x => x.TechnicianId);
+            builder.HasKey(x => x.UserId);
 
             builder.Property(x => x.FaceImageUrl)
                    .IsRequired();
@@ -24,9 +24,9 @@ namespace Persistence.Data.Configrations
             builder.Property(x => x.UploadedAt)
                    .HasDefaultValueSql("GETDATE()");
 
-            builder.HasOne(x => x.Technician)
-                   .WithOne(x => x.Document)
-                   .HasForeignKey<TechnicianDocument>(x => x.TechnicianId)
+            builder.HasOne(x => x.User)
+                   .WithOne(U=>U.Document)
+                   .HasForeignKey<UserDocument>(x => x.UserId)
                    .OnDelete(DeleteBehavior.Cascade);
         }
     }

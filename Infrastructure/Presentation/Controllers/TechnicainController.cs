@@ -29,7 +29,14 @@ namespace Presentation.Controllers
             var result = await _serviceManager.TechnicianService.GetByIdAsync(GetUserId());
             return  HandleResult(result);
         }
-        [Authorize(Roles = Roles.Admin + "," + Roles.Technician + ","+Roles.Client)]
+        [Authorize (Roles = Roles.Client)]
+        [HttpGet("GetTechnicianDetails")]
+        public async Task<ActionResult<TechniciaDetailsDto>> GetTechnician(string id)
+        {
+            var result = await _serviceManager.TechnicianService.GetByIdAsync(id);
+            return HandleResult<TechniciaDetailsDto>(result);
+        }
+        [Authorize(Roles =Roles.Client)]
         [HttpGet("GetAllTechnicians")]
         public async Task<ActionResult<IEnumerable<TechnicianDto>>> GetAll([FromQuery] TechnicianQuery query)
         {
@@ -38,7 +45,6 @@ namespace Presentation.Controllers
             return HandleResult<IEnumerable<TechnicianDto>>(result);
         }
        
-        
         [HttpPost("AddTechnician")]
         [Authorize(Roles = "Technician")]
         public async Task<IActionResult> AddTechnician([FromForm] AddTechnicianDto technicianDto)

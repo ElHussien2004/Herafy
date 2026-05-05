@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Service
 {
@@ -21,19 +22,11 @@ namespace Service
         IFileService _fileService,UserManager<ApplicationUser> userManager,
         RoleManager<IdentityRole> roleManager) : ITechnicianService
     {
-        public async Task<Result<IEnumerable<TechnicianDto>>> GetAllAsync(TechnicianQuery? query)
+        public async Task<Result<IEnumerable<TechnicianDto>>> GetAllAsync(TechnicianQuery query)
         {
-            IEnumerable<Technician> technicians=[];
-            if (query != null) {
-
-                var sp = new TechnicianSpecifications(query);
-                technicians = await _unitOfWork.TechnicalRepository.GetAllAsync(sp);
-            }
-            else
-            {
-                technicians=await _unitOfWork.TechnicalRepository.GetAllAsync();
-            }
-            
+            var sp = new TechnicianSpecifications(query);
+            var  technicians = await _unitOfWork.TechnicalRepository.GetAllAsync(sp);
+             
             if (technicians == null || !technicians.Any())
             {
                 return Result<IEnumerable<TechnicianDto>>.Ok(Enumerable.Empty<TechnicianDto>());
@@ -42,7 +35,18 @@ namespace Service
 
             return Result<IEnumerable<TechnicianDto>>.Ok(mappedData);
         }
+        public async Task<Result<IEnumerable<TechnicianDto>>> GetAllAdminAsync()
+        {
+            var sp = new TechnicianSpecifications();
+            var technicians = await _unitOfWork.TechnicalRepository.GetAllAsync(sp);
+            if (technicians == null || !technicians.Any())
+            {
+                return Result<IEnumerable<TechnicianDto>>.Ok(Enumerable.Empty<TechnicianDto>());
+            }
+            var mappedData = _mapper.Map<IEnumerable<TechnicianDto>>(technicians);
 
+            return Result<IEnumerable<TechnicianDto>>.Ok(mappedData);
+        }
         public async Task<Result<TechniciaDetailsDto>> GetByIdAsync(string id)
         {
             var sp=new TechnicianSpecifications(id);
@@ -251,13 +255,16 @@ namespace Service
             if (!saveReBack.IsSuccess)
                  return Error.Failure("فشل عمليه الحفظ", "حدث غطأ في الملفات المرسلة  يرجو الرفع مره اخري");
             ;
-            
+
+            //Get User 
+           var user= await userManager.FindByIdAsync(technicianId);
             // 4. Create document
-            var document = new TechnicianDocument
+            var document = new UserDocument
             {
                 FaceImageUrl = saveReFace.Value,
                 BackImageUrl = saveReBack.Value,
-                TechnicianId = technicianId
+                UserId = technicianId,
+                User=user
             };
 
             await _unitOfWork.DocumentRepository.AddAsync(document);
@@ -321,7 +328,7 @@ namespace Service
             return true;
         }
 
-        public async Task<Result<bool>> ChangeIsActive(string id, bool state)
+        public async Task<Result<bool>> ChangeIsActive(string id, StateUser state)
         {
             //get client 
             if (id == null)
@@ -334,7 +341,7 @@ namespace Service
                 return Error.NotFound("الفني غير موجود", $"لا يوجد الفني بالمعرف {id}");
             // is active false 
 
-            tec.IsActive = state;
+            tec.State = state;
             // update 
             _unitOfWork.TechnicalRepository.Update(tec);
             //save change
@@ -382,6 +389,7 @@ namespace Service
 
             return Result<IEnumerable<ServiceDto>>.Ok(mappedData);
         }
+
     }
 
     

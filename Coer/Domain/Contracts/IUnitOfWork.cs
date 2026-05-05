@@ -18,7 +18,7 @@ namespace Domain.Contracts
         public IGenericRepository<Technician,string> TechnicalRepository { get; }
         public IGenericRepository<Client, string> ClientRepository { get; }
 
-        public IGenericRepository<TechnicianDocument, string> DocumentRepository { get; }
+        public IGenericRepository<UserDocument, string> DocumentRepository { get; }
         public IGenericRepository<ServiceCategory, int> ServiceCategoryRepository { get; }
         public IGenericRepository<Order , int> OrderRepo { get; }
         public IGenericRepository<Review, int> ReviewRepo { get; }

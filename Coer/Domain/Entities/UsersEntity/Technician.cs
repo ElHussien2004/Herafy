@@ -44,10 +44,10 @@ namespace Domain.Entities.UsersEntity
 
         public string Government { get; set; }
 
-        public bool IsActive { get; set; }
+        public StateUser State {  get; set; }
         public double Latitude { get; set; }
         public DateTime CreatedAt { get; set; }
         public double Longitude { get; set; }
-        public TechnicianDocument Document { get; set; }
+        public UserDocument? Document { get; set; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Domain.Entities.UsersEntity;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,7 +16,7 @@ namespace Shared.DTOs.TechnicianDTOS
         public int ExperienceYears { get; set; }
         public string Bio { get; set; }
         public bool AvailabilityStatus { get; set; }//هو متاح للطلب ولا لا 
-        public bool IsActive { get; set; }
+        public string State{ get; set; }
         public double RatingAvg { get; set; }
         public DateTime CreatedAt { get; set; }
         public int CompletedJobs { get; set; }

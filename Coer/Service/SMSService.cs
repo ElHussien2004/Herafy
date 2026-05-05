@@ -39,7 +39,7 @@ namespace Service
                 if (result.Status == MessageResource.StatusEnum.Failed ||
                     result.Status == MessageResource.StatusEnum.Undelivered)
                 {
-                    return Error.Failure("SMS.Failed", "فشل في إرسال الرسالة");
+                    return Error.Failure($"SMS.Failed:{result.Status}", "فشل في إرسال الرسالة");
                 }
 
                 return Result.Ok();

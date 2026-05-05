@@ -60,7 +60,7 @@ namespace Service
 
                 if (!sent.IsSuccess)
                 {
-                    await RevertRedisKeysAsync(); 
+                   // await RevertRedisKeysAsync(); 
                     return Error.Failure("SMS.Failed", "فشل في إرسال الرسالة");
                 }
 

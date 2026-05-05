@@ -52,6 +52,13 @@ namespace Presentation.Controllers
             var result = await _serviceManager.TechnicianService.GetByIdAsync(id);
             return HandleResult(result);
         }
+        [Authorize(Roles = Roles.Client)]
+        [HttpPost("AddDocuments")]
+        public async Task<ActionResult<bool>> UploadDocuments([FromForm] UploadDocumentsDto dto)
+        {
+            var result = await _serviceManager.ClientService.UploadDocumentsAsync(GetUserId(), dto);
+            return HandleResult(result);
+        }
 
     }
 }

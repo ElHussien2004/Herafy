@@ -10,12 +10,13 @@ namespace Service.Specifications
 {
     class TechnicianSpecifications:BaseSpecifications<Technician>
     {
-        public TechnicianSpecifications(TechnicianQuery? query) 
+        public TechnicianSpecifications(TechnicianQuery query) 
             :base(T =>
                 (!query.ServiceId.HasValue || T.ServiceCategoryId == query.ServiceId) &&
                 (string.IsNullOrEmpty(query.Search) ||
                  T.User.FullName.Contains(query.Search) ||
-                 T.User.PhoneNumber.Contains(query.Search))
+                 T.User.PhoneNumber.Contains(query.Search)
+                && T.State==StateUser.Active)
             )
         {
             AddInclude(T => T.ServiceCategory);
@@ -50,6 +51,13 @@ namespace Service.Specifications
             AddInclude(T => T.ServiceCategory);
             AddInclude(T => T.User);
             AddInclude(T=>T.Document);
+        }
+
+        public TechnicianSpecifications():base(null)
+        {
+            AddInclude(T => T.ServiceCategory);
+            AddInclude(T => T.User);
+            AddInclude(T => T.Document);
         }
        
 

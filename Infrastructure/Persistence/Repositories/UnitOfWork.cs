@@ -25,9 +25,9 @@ namespace Persistence.Repositories
             new(() => new GenericRepository<Client, string>(_Context));
         public IGenericRepository<Client, string> ClientRepository => _clientRepo.Value;
 
-        private readonly Lazy<IGenericRepository<TechnicianDocument, string>> _documentRepo =
-           new(() => new GenericRepository<TechnicianDocument, string>(_Context));
-        public IGenericRepository<TechnicianDocument, string> DocumentRepository => _documentRepo.Value;
+        private readonly Lazy<IGenericRepository<UserDocument, string>> _documentRepo =
+           new(() => new GenericRepository<UserDocument, string>(_Context));
+        public IGenericRepository<UserDocument, string> DocumentRepository => _documentRepo.Value;
 
         private readonly Lazy<IGenericRepository<ServiceCategory, int>> _ServicRepo =
            new(() => new GenericRepository<ServiceCategory, int>(_Context));
