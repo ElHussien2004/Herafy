@@ -2,6 +2,7 @@
 using Domain.Contracts;
 using Domain.Entities.UsersEntity;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -18,7 +19,7 @@ namespace Service
     public class ServiceManager(IConfiguration configuration,IUnitOfWork unitOfWork,IFileService fileService,IMapper mapper
         ,IConnectionMultiplexer connection,ISMSService sMS,UserManager<ApplicationUser> userManager,
         IWebHostEnvironment environment,
-        RoleManager<IdentityRole> roleManager, ILogger<OrderService> _logger, IHttpClientFactory _httpClientFactory) : IServiceManager
+        RoleManager<IdentityRole> roleManager, ILogger<OrderService> _logger, IHttpClientFactory _httpClientFactory, IHttpContextAccessor _httpContextAccessor) : IServiceManager
     {
         private readonly Lazy<ISMSService> _LazysmsService = new Lazy<ISMSService>(() => new SMSService(configuration));
         public ISMSService SMSService =>_LazysmsService.Value;
@@ -42,5 +43,8 @@ namespace Service
         private readonly Lazy<IReviewService> _LazyReviewService = new Lazy<IReviewService>(() => new ReviewService(unitOfWork,_httpClientFactory,configuration,mapper));
 
         public IReviewService ReviewService => _LazyReviewService.Value;
+
+        private readonly Lazy<IComplaintService> _LazycomplaintService = new Lazy<IComplaintService>(() => new ComplaintService(unitOfWork, mapper, userManager, _httpContextAccessor));
+        public IComplaintService ComplaintService => _LazycomplaintService.Value;
     }
 }
