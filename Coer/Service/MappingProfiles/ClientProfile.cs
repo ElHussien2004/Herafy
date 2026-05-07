@@ -51,10 +51,10 @@ namespace Service.MappingProfiles
                 .ForMember(d => d.State, sr => sr.MapFrom(s => s.State.ToString()))
                 .ForMember(d => d.FaceImageUrl,
                     opt => opt.MapFrom<URLResolver<Client, GetDecumentClient>, string?>(
-                        s => s.Document != null ? s.Document.FaceImageUrl : null
+                        s => s.User.Document != null ? s.User.Document.FaceImageUrl : null
                     )).ForMember(d => d.BackImageUrl,
                     opt => opt.MapFrom<URLResolver<Client, GetDecumentClient>, string?>(
-                        s => s.Document != null ? s.Document.BackImageUrl : null
+                        s => s.User.Document != null ? s.User.Document.BackImageUrl : null
                     ));
         }
     }

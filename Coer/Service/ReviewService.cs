@@ -78,8 +78,9 @@ namespace Service
                 {
                     return Error.Failure("عملية غير مسموحة", "لا يمكن تقييم طلب لم يكتمل بعد.");
                 }
-
+                
                
+
                 var deviationResult = await CalculateRatingDeviationAsync(order.TechnicianId, review.Rating);
                 float deviation = deviationResult.IsSuccess ? deviationResult.Value : 0;
                 var fraudRequest = new FraudCheckRequestDto
@@ -212,8 +213,22 @@ namespace Service
 
                 if (review == null)
                     return Error.NotFound("التقييم غير موجود", "لا يمكن اعتماد تقييم غير موجود.");
+                var sporder = new OrderWithDetailsSpecification(review.OrderId);
+                var Order =await  _unitOfWork.OrderRepo.GetByIdAsync(sporder);
 
+                var sp=new TechnicianSpecifications(Order.TechnicianId);
+                var tec = await _unitOfWork.TechnicalRepository.GetByIdAsync(sp);
+
+                
+                decimal totalStars = (decimal)(tec.RatingAvg * tec.ReviewsCount);
+
+                // 2. زيادة عدد التقييمات واحد
+                tec.ReviewsCount += 1;
+
+                // 3. حساب المتوسط الجديد
+                tec.RatingAvg = (double)((totalStars + review.Rating) / tec.ReviewsCount);
                 review.IsApproved = true;
+                _unitOfWork.TechnicalRepository.Update(tec);
                 _unitOfWork.ReviewRepo.Update(review);
                 var result = await _unitOfWork.SaveAsync();
 

@@ -266,7 +266,8 @@ namespace Service
                 UserId = technicianId,
                 User=user
             };
-
+            technician.State = StateUser.Pending;
+             _unitOfWork.TechnicalRepository.Update(technician);
             await _unitOfWork.DocumentRepository.AddAsync(document);
 
             // 5. Save changes

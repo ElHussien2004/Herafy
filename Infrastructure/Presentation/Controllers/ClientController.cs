@@ -23,8 +23,8 @@ namespace Presentation.Controllers
             return HandleResult(result);
         }
         [Authorize(Roles = Roles.Admin)]
-        [HttpDelete("Delete{id}")]
-        public async Task<ActionResult<bool>> Delete(string id)
+        [HttpDelete("Delete")]
+        public async Task<ActionResult<bool>> Delete([FromQuery]string id)
         {
             var result = await _serviceManager.ClientService.DeleteAsync(id);
 

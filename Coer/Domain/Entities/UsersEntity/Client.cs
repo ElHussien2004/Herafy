@@ -31,7 +31,7 @@ namespace Domain.Entities.UsersEntity
 
         public double Longitude { get; set; }
 
-        public UserDocument? Document { get; set; }
+      
 
     }
 }

@@ -39,6 +39,13 @@ namespace Service.Specifications
             AddInclude(x => x.Technician.User); 
         }
 
-
+        public OrderWithDetailsSpecification(int id) : base(O=>O.Id==id)
+        {
+            AddInclude(x => x.ServiceCategory);
+            AddInclude(x => x.Client);
+            AddInclude(x => x.Client.User);
+            AddInclude(x => x.Technician);
+            AddInclude(x => x.Technician.User);
+        }
     }
 }

@@ -23,7 +23,9 @@ namespace Persistence.Data.Configrations
                    .IsRequired()
                    .HasMaxLength(100);
 
-
+            builder
+               .Property(o => o.InspectedPrice)
+               .HasPrecision(10, 2);
             builder.Property(x => x.ScheduledDate)
                    .IsRequired();
 

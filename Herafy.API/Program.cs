@@ -96,7 +96,7 @@ namespace Herafy.Api
             var app = builder.Build();
 
             #region Add Admin
-            using (var scope = app.Services.CreateScope())
+           /* using (var scope = app.Services.CreateScope())
             {
                 var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
                 var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
@@ -120,7 +120,7 @@ namespace Herafy.Api
                     await userManager.CreateAsync(user, "P@ssw0rd");
                     await userManager.AddToRoleAsync(user, "Admin");
                 }
-            }
+            }*/
             #endregion
 
             // Configure the HTTP request pipeline.

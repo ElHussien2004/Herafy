@@ -33,7 +33,7 @@ namespace Domain.Entities.UsersEntity
         public bool AvailabilityStatus { get; set; }//هو متاح للطلب ولا لا 
 
         public double RatingAvg { get; set; }
-
+        public int ReviewsCount { get; set; } = 0;
         public string Bio { get; set; }
 
         public decimal InspectedPrice { get; set; }
@@ -48,6 +48,6 @@ namespace Domain.Entities.UsersEntity
         public double Latitude { get; set; }
         public DateTime CreatedAt { get; set; }
         public double Longitude { get; set; }
-        public UserDocument? Document { get; set; }
+      
     }
 }

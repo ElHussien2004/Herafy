@@ -12,6 +12,10 @@ namespace Service.Specifications
         public ClientSpecifications(string id):base(C=>C.Id ==id)
         {
             AddInclude(C => C.User);
+            AddInclude(c => c.User.Document);
+            AddInclude(c => c.Orders);
+            AddInclude(c => c.Chats);
+            
         }
          public ClientSpecifications(string? search,bool s)
             : base(c =>
@@ -20,7 +24,7 @@ namespace Service.Specifications
                 c.User.PhoneNumber.Contains(search))
          {
                    AddInclude(c => c.User);
-                   AddInclude(c => c.Orders);
+            AddInclude(c => c.Orders);
          }
         public ClientSpecifications()
             : base(null)

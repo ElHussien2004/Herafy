@@ -49,15 +49,15 @@ namespace Service.Specifications
         public TechnicianSpecifications(string id):base(T=>T.Id ==id)
         {
             AddInclude(T => T.ServiceCategory);
-            AddInclude(T => T.User);
-            AddInclude(T=>T.Document);
+            AddInclude(T => T.User.Document);
+           // AddInclude(T=>T.Document);
         }
 
         public TechnicianSpecifications():base(null)
         {
             AddInclude(T => T.ServiceCategory);
             AddInclude(T => T.User);
-            AddInclude(T => T.Document);
+            AddInclude(T => T.User.Document);
         }
        
 

@@ -29,25 +29,25 @@ namespace Presentation.Controllers
             return HandleResult(result);
         }
 
-        [HttpGet("GetComplaintDetails/{id}")]
+        [HttpGet("GetComplaintDetails")]
         [Authorize(Roles = Roles.Admin)]
-        public async Task<ActionResult<GetDetailsComplaintDto>> GetComplaintDetails(int id)
+        public async Task<ActionResult<GetDetailsComplaintDto>> GetComplaintDetails([FromQuery]int id)
         {
             var result = await serviceManager.ComplaintService.GetComplaintByIdAsync(id);
             return HandleResult(result);
         }
 
-        [HttpPatch("RespondToComplaint/{complaintId}")]
+        [HttpPatch("RespondToComplaint")]
         [Authorize(Roles = Roles.Admin)]
-        public async Task<ActionResult<ComplaintResponseDto>> RespondToComplaint(int complaintId, [FromBody] string response)
+        public async Task<ActionResult<ComplaintResponseDto>> RespondToComplaint([FromQuery]int complaintId, [FromBody] string response)
         {
             var result = await serviceManager.ComplaintService.RespondToComplaintAsync(complaintId, response);
             return HandleResult(result);
         }
 
-        [HttpDelete("DeleteComplaint/{id}")]
+        [HttpDelete("DeleteComplaint")]
         [Authorize(Roles = Roles.Admin)]
-        public async Task<ActionResult<bool>> DeleteComplaint(int id)
+        public async Task<ActionResult<bool>> DeleteComplaint([FromQuery]int id)
         {
             var result = await serviceManager.ComplaintService.DeleteComplaintAsync(id);
             return HandleResult(result);

@@ -22,9 +22,9 @@ namespace Presentation.Controllers
             return HandleResult(result);
         }
 
-        [HttpGet("GetTechnicianReviews/{technicianId}")]
-        [Authorize(Roles = Roles.Technician)]
-        public async Task<ActionResult<IEnumerable<GetTechnicianReviews>>> GetByTechnician(string technicianId)
+        [HttpGet("GetTechnicianReviews")]
+        [Authorize(Roles = Roles.Technician+","+Roles.Client)]
+        public async Task<ActionResult<IEnumerable<GetTechnicianReviews>>> GetByTechnician([FromQuery]string technicianId)
         {
             var result = await serviceManager.ReviewService.GetReviewsByTechnicianIdAsync(technicianId);
             return HandleResult(result);
@@ -36,23 +36,23 @@ namespace Presentation.Controllers
             var result = await serviceManager.ReviewService.GetAll();
             return HandleResult(result);
         }
-        [HttpGet("GetReviewDetails/{id}")]
+        [HttpGet("GetReviewDetails")]
         [Authorize(Roles = Roles.Admin)]
-        public async Task<ActionResult<GetDetailsReviewAdmin>> GetDetails(int id)
+        public async Task<ActionResult<GetDetailsReviewAdmin>> GetDetails([FromQuery]int id)
         {
             var result = await serviceManager.ReviewService.GetDetailsReviewAdmin(id);
             return HandleResult(result);
         }
-        [HttpDelete("admin/delete/{id}")]
+        [HttpDelete("admin/deleteReview")]
         [Authorize(Roles = Roles.Admin)]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete([FromQuery] int id)
         {
             var result = await serviceManager.ReviewService.DeleteReview(id);
             return HandleResult(result);
         }
-        [HttpPatch("ApprovedReview/{ReviewId}")]
+        [HttpPatch("ApprovedReview")]
         [Authorize(Roles=Roles.Admin)]
-        public async Task<IActionResult>ActionREview(int ReviewId)
+        public async Task<IActionResult>ActionREview([FromQuery]int ReviewId)
         {
             var result = await serviceManager.ReviewService.ApprovedReview(ReviewId);
             return HandleResult(result);

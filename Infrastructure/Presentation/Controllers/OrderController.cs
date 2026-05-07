@@ -25,55 +25,55 @@ namespace Presentation.Controllers
         }
         //-2
         [Authorize(Roles = Roles.Client)]
-        [HttpGet("GetDetailsOrderClient/{orderId:int}")]
-        public async Task<ActionResult<GetDetailsOrderClientDTO>> GetOrderDetailsForClient(int orderId)
+        [HttpGet("GetDetailsOrderClient")]
+        public async Task<ActionResult<GetDetailsOrderClientDTO>> GetOrderDetailsForClient([FromQuery] int orderId)
         {
             var result = await _serviceManager.OrderService.GetOrderDetailsClient(orderId);
             return HandleResult(result);
         }
         //-5
         [Authorize(Roles = Roles.Technician)]
-        [HttpGet("GetDetailsOrderTechnician/{orderId:int}")]
-        public async Task<ActionResult<GetDetailsOrderTechnicianDTO>> GetOrderDetailsForTechnician(int orderId)
+        [HttpGet("GetDetailsOrderTechnician")]
+        public async Task<ActionResult<GetDetailsOrderTechnicianDTO>> GetOrderDetailsForTechnician([FromQuery]int orderId)
         {
             var result = await _serviceManager.OrderService.GetOrderDetailsTechnician(orderId);
             return HandleResult(result);
         }
         //-9
         [Authorize(Roles = Roles.Admin)]
-        [HttpGet("GetDetailsOrderAdmin/{orderId:int}")]
-        public async Task<ActionResult<GetDetailsOrderAdminDTO>> GetOrderDetailsForAdmin(int orderId)
+        [HttpGet("GetDetailsOrderAdmin")]
+        public async Task<ActionResult<GetDetailsOrderAdminDTO>> GetOrderDetailsForAdmin([FromQuery] int orderId)
         {
             var result = await _serviceManager.OrderService.GetOrderDetailsAdmin(orderId);
             return HandleResult(result);
         }
         //-11
         [Authorize(Roles = Roles.Technician + "," + Roles.Client)]
-        [HttpPatch("ChangeStatusOrder/{orderId:int}")]
-        public async Task<IActionResult> UpdateStatus(int orderId, [FromBody] int statusValue)
+        [HttpPatch("ChangeStatusOrder")]
+        public async Task<IActionResult> UpdateStatus([FromQuery]int orderId, [FromBody] int statusValue)
         {
             var result = await _serviceManager.OrderService.UpdateStatusAsync(orderId, statusValue);
             return HandleResult(result);
         }
         //-10
         [Authorize(Roles = Roles.Technician)]
-        [HttpPatch("SetFinalPrice/{orderId:int}")]
-        public async Task<IActionResult> UpdatePrice(int orderId, [FromBody] decimal finalPrice)
+        [HttpPatch("SetFinalPrice")]
+        public async Task<IActionResult> UpdatePrice([FromQuery] int orderId, [FromBody] decimal finalPrice)
         {
             var result = await _serviceManager.OrderService.UpdateFinalPriceAsync(orderId, finalPrice);
             return HandleResult(result);
         }
         //-6
         [Authorize(Roles = Roles.Technician)]
-        [HttpPost("CompleteOrder/{orderId:int}")]
-        public async Task<IActionResult> CompleteOrder(int orderId)
+        [HttpPost("CompleteOrder")]
+        public async Task<IActionResult> CompleteOrder([FromQuery] int orderId)
         {
             var result = await _serviceManager.OrderService.CompleteOrder(orderId);
             return HandleResult(result);
         }
         [Authorize(Roles = Roles.Technician)]
-        [HttpPost("UploadeWorkImage/{orderId:int}")]
-        public async Task<ActionResult<string>> UploadeWorkImage(int orderId, [FromForm] CompleteOrderDto WorkImage)
+        [HttpPost("UploadeWorkImage")]
+        public async Task<ActionResult<string>> UploadeWorkImage([FromQuery] int orderId, [FromForm] CompleteOrderDto WorkImage)
         {
             var result = await _serviceManager.OrderService.UploadWorkImage(orderId, WorkImage.WorkImage);
             return HandleResult(result);
@@ -88,7 +88,7 @@ namespace Presentation.Controllers
         }
         //3
         [Authorize(Roles = Roles.Client + "," +Roles.Admin)]
-        [HttpGet("GetClientOrders/{clientId}/{State}")]
+        [HttpGet("GetClientOrders")]
         public async Task<ActionResult<IEnumerable<GetClientOrderDTO>>> GetClientOrders([FromQuery] string clientId, [FromQuery] State state)
         {
             var result = await _serviceManager.OrderService.GetClientOrders(clientId, state);

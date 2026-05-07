@@ -65,6 +65,9 @@ namespace Service.MappingProfiles
                 .ForMember(des => des.Id, sr => sr.MapFrom(s => s.Id))
                 .ForMember(des => des.ServiceName, sr => sr.MapFrom(s => s.ServiceCategory.Name))
                 .ForMember(des => des.ScheduledDate, sr => sr.MapFrom(s => s.ScheduledDate))
+                .ForMember(des => des.WorkImage,
+                    opt => opt.MapFrom<URLResolver<Order, GetDetailsOrderAdminDTO>, string?>(
+                        s => s.ImageWorkURL != null ? s.ImageWorkURL : null))
                 .ForMember(des => des.ScheduledTime, sr => sr.MapFrom(s => s.ScheduledTime))
                 .ForMember(des => des.InspectedPrice, sr => sr.MapFrom(s => s.InspectedPrice))
                 .ForMember(des => des.AfterPrice, sr => sr.MapFrom(s => s.FinalPrice - s.InspectedPrice))
@@ -99,7 +102,10 @@ namespace Service.MappingProfiles
                 .ForMember(des => des.InspectedPrice, sr => sr.MapFrom(s => s.InspectedPrice))
                 .ForMember(des => des.State, sr => sr.MapFrom(s => s.Status.ToString()))
                 .ForMember(des=>des.ProblemDetails,sr=>sr.MapFrom(s=>s.ProblemDetails))
-                .ForMember(des=>des.PlaceDetails,sr=>sr.MapFrom(s=>s.PlaceDetails));
+                .ForMember(des=>des.PlaceDetails,sr=>sr.MapFrom(s=>s.PlaceDetails))
+                 .ForMember(des => des.ImageWorkURL,
+                    opt => opt.MapFrom<URLResolver<Order, GetTechnicianOrder>, string?>(
+                        s => s.ImageWorkURL != null ? s.ImageWorkURL : null));
 
             CreateMap<Order, GetClientOrderDTO>()
                .ForMember(des => des.Id, sr => sr.MapFrom(s => s.Id))

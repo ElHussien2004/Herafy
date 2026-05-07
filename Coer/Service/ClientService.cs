@@ -279,7 +279,8 @@ namespace Service
                 UserId = ClientId,
                 User = user
             };
-
+            client.State = StateUser.Pending;
+            _unitOfWork.ClientRepository.Update(client);
             await _unitOfWork.DocumentRepository.AddAsync(document);
 
             // 5. Save changes

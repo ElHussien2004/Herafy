@@ -16,7 +16,7 @@ namespace Shared.DTOs.OrderDtos
         public DateTime ScheduledDate { get; set; }
         public TimeSpan ScheduledTime { get; set; }
         public decimal InspectedPrice { get; set; }
-
+        public string? ImageWorkURL { get; set; }
         public string State { get; set; }
     }
 }

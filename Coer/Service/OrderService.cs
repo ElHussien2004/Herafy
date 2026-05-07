@@ -424,6 +424,8 @@ namespace Service
                 return Error.NotFound("الطلب غير موجود", "لا يمكن العثور على الطلب.");
 
             var result = await _fileService.SaveFileAsync(WorkImage, "WorkImages");
+            order.ImageWorkURL = result.Value;
+            await _unitOfWork.SaveAsync();
             return result;
         }
     }
