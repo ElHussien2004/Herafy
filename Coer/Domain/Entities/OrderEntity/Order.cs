@@ -47,6 +47,8 @@ namespace Domain.Entities.OrderEntity
 
         public DateTime CreatedAt { get; set; }
 
-     
+        #region Relation Complaint
+        public ICollection<Complaint> Complaints { get; set; } = new List<Complaint>();
+        #endregion
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Domain.Entities.Communications;
+using Domain.Entities.OrderEntity;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
@@ -21,5 +22,6 @@ namespace Domain.Entities.UsersEntity
 
         public Technician? Technician { get; set; }
         public UserDocument? Document { get; set; }
+        public ICollection<Complaint> Complaints { get; set; } = new List<Complaint>();
     }
 }
