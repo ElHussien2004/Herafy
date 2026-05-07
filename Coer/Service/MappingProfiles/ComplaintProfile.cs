@@ -20,17 +20,22 @@ namespace Service.MappingProfiles
             // Get All Complaints
             CreateMap<Complaint, GetAllComplaintDto>()
                 .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.FullName))
-                .ForMember(dest => dest.UserRole, opt => opt.Ignore());
+                .ForMember(dest => dest.UserRole, opt => opt.Ignore())
+                .ForMember(des=>des.Status,sr=>sr.MapFrom(s=>s.Status.ToString()));
 
             // Get Complaint Details
             CreateMap<Complaint, GetDetailsComplaintDto>()
                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.FullName))
-               .ForMember(dest => dest.UserRole, opt => opt.Ignore());
+               .ForMember(dest => dest.UserRole, opt => opt.Ignore())
+               .ForMember(des => des.Status, sr => sr.MapFrom(s => s.Status.ToString()))
+               .ForMember(des=>des.PhoneNumber,sr=>sr.MapFrom(s=>s.User.PhoneNumber))
+               ;
 
 
             // Response DTO
             CreateMap<Complaint, ComplaintResponseDto>()
-                .ForMember(dest => dest.ComplaintId, opt => opt.MapFrom(src => src.Id));
+                .ForMember(dest => dest.ComplaintId, opt => opt.MapFrom(src => src.Id))
+                .ForMember(des => des.Status, sr => sr.MapFrom(s => s.Status.ToString()));
         }
 
     }

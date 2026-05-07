@@ -23,7 +23,8 @@ namespace Persistence.Data.Configrations
                    .HasMaxLength(2000);
 
             builder.Property(c => c.Response)
-                   .HasMaxLength(2000);
+                   .HasMaxLength(2000)
+                   .HasDefaultValue("");
 
             builder.Property(c => c.CreatedAt)
                    .HasDefaultValueSql("GETDATE()")

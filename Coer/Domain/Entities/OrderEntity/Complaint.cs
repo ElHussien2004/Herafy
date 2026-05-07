@@ -18,7 +18,7 @@ namespace Domain.Entities.OrderEntity
         public ApplicationUser User { get; set; }
         public string? Title { get; set; }
         public string Description { get; set; }
-        public string? Response { get; set; }
+        public string? Response { get; set; }=string.Empty;
         public DateTime CreatedAt { get; set; }
         public ComplaintStatus Status { get; set; }
     }

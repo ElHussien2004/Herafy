@@ -228,6 +228,7 @@ namespace Service
                 // 3. حساب المتوسط الجديد
                 tec.RatingAvg = (double)((totalStars + review.Rating) / tec.ReviewsCount);
                 review.IsApproved = true;
+                review.is_suspicious = false;
                 _unitOfWork.TechnicalRepository.Update(tec);
                 _unitOfWork.ReviewRepo.Update(review);
                 var result = await _unitOfWork.SaveAsync();

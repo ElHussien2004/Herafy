@@ -11,6 +11,6 @@ namespace Shared.DTOs.ComplaintDTOS
     {
         public int ComplaintId { get; set; }
         public string Response { get; set; }
-        public ComplaintStatus Status { get; set; }
+        public string Status { get; set; }
     }
 }

@@ -17,6 +17,6 @@ namespace Shared.DTOs.ComplaintDTOS
         public string? Title { get; set; }
         public string? Response { get; set; }
         public DateTime CreatedAt { get; set; }
-        public ComplaintStatus Status { get; set; }
+        public string Status { get; set; }
     }
 }
