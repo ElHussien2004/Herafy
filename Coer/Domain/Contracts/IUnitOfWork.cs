@@ -24,6 +24,7 @@ namespace Domain.Contracts
         public IGenericRepository<Review, int> ReviewRepo { get; }
         public IGenericRepository<Chat,int>ChatRepo { get; }
         public IGenericRepository<Message,int>MessageRepo { get; }
+        public IGenericRepository<Complaint, int> ComplaintRepo { get; }
         Task<IDbContextTransaction> BeginTransactionAsync();
         Task<int> SaveAsync();
 

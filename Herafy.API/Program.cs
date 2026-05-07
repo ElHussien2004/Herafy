@@ -52,6 +52,8 @@ namespace Herafy.Api
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IServiceManager, ServiceManager>();
             builder.Services.AddScoped<IOrderService, OrderService>();
+            builder.Services.AddScoped<IComplaintService, ComplaintService>();
+
             builder.Services.AddHttpClient();
             builder.Services.AddScoped<IReviewService, ReviewService>();
 
@@ -62,6 +64,7 @@ namespace Herafy.Api
             builder.Services.AddAutoMapper(c => c.AddProfile(new OrderProfile()));
             builder.Services.AddAutoMapper(c => c.AddProfile(new ReviewProfile()));
             builder.Services.AddAutoMapper(c => c.AddProfile(new ServiceProfile()));
+            builder.Services.AddAutoMapper(c => c.AddProfile(new ComplaintProfile()));
 
 
             #endregion

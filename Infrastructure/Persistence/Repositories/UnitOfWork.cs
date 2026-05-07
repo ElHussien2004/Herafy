@@ -46,7 +46,9 @@ namespace Persistence.Repositories
         private readonly Lazy<IGenericRepository<Message, int>> _MessageRepo =
           new(() => new GenericRepository<Message, int>(_Context));
         public IGenericRepository<Message, int> MessageRepo => _MessageRepo.Value;
-
+        private readonly Lazy<IGenericRepository<Complaint, int>> _ComplaintRepo =
+         new(() => new GenericRepository<Complaint, int>(_Context));
+        public IGenericRepository<Complaint, int> ComplaintRepo => _ComplaintRepo.Value;
         public Task<int> SaveAsync() => _Context.SaveChangesAsync();
         public async Task<IDbContextTransaction> BeginTransactionAsync()
         {
