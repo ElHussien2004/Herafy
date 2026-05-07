@@ -10,9 +10,9 @@ using System.Threading.Tasks;
 
 namespace Service.MappingProfiles
 {
-    public class ServicProfile : Profile
+    public class TechnicianProfile : Profile
     {
-        public ServicProfile()
+        public TechnicianProfile()
         {
             CreateMap<Technician, TechniciaDetailsDto>()
                 .ForMember(d => d.ServiceCategory,
@@ -35,7 +35,8 @@ namespace Service.MappingProfiles
                     ))
                 .ForMember(des=>des.UserId,sr=>sr.MapFrom(s=>s.Id))
                 .ForMember(des=>des.Bio,sr=>sr.MapFrom(s=>s.Bio))
-                .ForMember(des=>des.State,sr=>sr.MapFrom(s=>s.State.ToString()));
+                .ForMember(des=>des.State,sr=>sr.MapFrom(s=>s.State.ToString()))
+                .ForMember(des=>des.InspectedPrice,sr=>sr.MapFrom(s=>s.InspectedPrice));
 
             CreateMap< AddTechnicianDto,Technician>();
 

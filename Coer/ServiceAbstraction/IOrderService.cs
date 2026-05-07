@@ -27,11 +27,12 @@ namespace ServiceAbstraction
         Task<Result> UpdateStatusAsync(int id, int statusValue);
         Task<Result> UpdateFinalPriceAsync(int id, decimal finalPrice);
        
-        Task<Result>CompleteOrder (int OrderId,IFormFile? WorkImage);
+        Task<Result>CompleteOrder (int OrderId);
         Task<Result<int>>CountOrderTechnicianAsync(string TechnicianId);
         Task<Result<int>> CountOrderClientAsync(string clientId);
         Task<Result<int>> CountOrdersCompleted();
 
         Task<Result<decimal>> TotalPriceUser(string userid,bool IsTec);
+        Task<Result<string>> UploadWorkImage(int OrderId,IFormFile WorkImage);
     }
 }

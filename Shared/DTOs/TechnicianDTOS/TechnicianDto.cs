@@ -15,6 +15,7 @@ namespace Shared.DTOs.TechnicianDTOS
         public string ServiceCategory { get; set; }
         public int ExperienceYears { get; set; }
         public string Bio { get; set; }
+        public decimal InspectedPrice { get; set; }
         public bool AvailabilityStatus { get; set; }//هو متاح للطلب ولا لا 
         public string State{ get; set; }
         public double RatingAvg { get; set; }

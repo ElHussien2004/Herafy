@@ -79,7 +79,8 @@ namespace Service.MappingProfiles
                         s => s.Technician != null ? s.Technician.User.ProfileImageURL : null))
                  .ForMember(des => des.NameTec, sr => sr.MapFrom(s => s.Technician.User.FullName))
                 .ForMember(des => des.RatingAvg, sr => sr.MapFrom(s => s.Technician.RatingAvg))
-                .ForMember(des => des.State, sr => sr.MapFrom(s => s.Status.ToString()));
+                .ForMember(des => des.State, sr => sr.MapFrom(s => s.Status.ToString()))
+                .ForMember(des=>des.PhoneClient,sr=>sr.MapFrom(s=>s.Client.User.PhoneNumber));
 
             CreateMap<Order, GetAllOrderDTO>()
                 .ForMember(des => des.NameCli, sr => sr.MapFrom(s => s.Client.User.FullName))

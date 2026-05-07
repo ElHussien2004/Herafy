@@ -49,7 +49,7 @@ namespace Presentation.Controllers
         }
         //-11
         [Authorize(Roles = Roles.Technician + "," + Roles.Client)]
-        [HttpPatch("{orderId:int}/ChangeStatusOrder")]
+        [HttpPatch("ChangeStatusOrder/{orderId:int}")]
         public async Task<IActionResult> UpdateStatus(int orderId, [FromBody] int statusValue)
         {
             var result = await _serviceManager.OrderService.UpdateStatusAsync(orderId, statusValue);
@@ -57,7 +57,7 @@ namespace Presentation.Controllers
         }
         //-10
         [Authorize(Roles = Roles.Technician)]
-        [HttpPatch("{orderId:int}/SetFinalPrice")]
+        [HttpPatch("SetFinalPrice/{orderId:int}")]
         public async Task<IActionResult> UpdatePrice(int orderId, [FromBody] decimal finalPrice)
         {
             var result = await _serviceManager.OrderService.UpdateFinalPriceAsync(orderId, finalPrice);
@@ -65,10 +65,17 @@ namespace Presentation.Controllers
         }
         //-6
         [Authorize(Roles = Roles.Technician)]
-        [HttpPost("{orderId:int}/CompleteOrder")]
-        public async Task<IActionResult> CompleteOrder(int orderId,[FromForm] CompleteOrderDto WorkImage)
+        [HttpPost("CompleteOrder/{orderId:int}")]
+        public async Task<IActionResult> CompleteOrder(int orderId)
         {
-            var result = await _serviceManager.OrderService.CompleteOrder(orderId, WorkImage.WorkImage);
+            var result = await _serviceManager.OrderService.CompleteOrder(orderId);
+            return HandleResult(result);
+        }
+        [Authorize(Roles = Roles.Technician)]
+        [HttpPost("UploadeWorkImage/{orderId:int}")]
+        public async Task<ActionResult<string>> UploadeWorkImage(int orderId, [FromForm] CompleteOrderDto WorkImage)
+        {
+            var result = await _serviceManager.OrderService.UploadWorkImage(orderId, WorkImage.WorkImage);
             return HandleResult(result);
         }
         //-8

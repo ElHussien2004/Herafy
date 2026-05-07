@@ -14,7 +14,8 @@ namespace Service.MappingProfiles
         public ServiceProfile()
         {
             CreateMap<ServiceCategory,ServiceDto>()
-                .ForMember(des=>des.Name ,sr=>sr.MapFrom(s=>s.Name));
+                .ForMember(des=>des.Name ,sr=>sr.MapFrom(s=>s.Name))
+                .ForMember(des=>des.Id,sr=>sr.MapFrom(s=>s.Id));
         }
     }
 }

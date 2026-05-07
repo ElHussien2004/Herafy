@@ -56,12 +56,13 @@ namespace Herafy.Api
             builder.Services.AddScoped<IReviewService, ReviewService>();
 
             #region Profile AutoMapper
-            builder.Services.AddAutoMapper(a => a.AddProfile(new ServicProfile()));
+           
             builder.Services.AddAutoMapper(c=>c.AddProfile(new ClientProfile()));
-            builder.Services.AddAutoMapper(c => c.AddProfile(new ServicProfile()));
-            builder.Services.AddAutoMapper(c => c.AddProfile(new ServicProfile()));
+            builder.Services.AddAutoMapper(c => c.AddProfile(new TechnicianProfile()));
             builder.Services.AddAutoMapper(c => c.AddProfile(new OrderProfile()));
             builder.Services.AddAutoMapper(c => c.AddProfile(new ReviewProfile()));
+            builder.Services.AddAutoMapper(c => c.AddProfile(new ServiceProfile()));
+
 
             #endregion
 

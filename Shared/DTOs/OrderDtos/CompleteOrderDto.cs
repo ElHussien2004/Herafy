@@ -9,6 +9,6 @@ namespace Shared.DTOs.OrderDtos
 {
     public class CompleteOrderDto
     {
-        public IFormFile? WorkImage { get; set; }
+        public IFormFile WorkImage { get; set; }
     }
 }

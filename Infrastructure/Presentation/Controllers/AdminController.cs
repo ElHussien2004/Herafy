@@ -78,13 +78,7 @@ namespace Presentation.Controllers
 
             return HandleResult<int>(result);
         }
-        [HttpGet("GetClientDetails")]
-        public async Task<ActionResult<ClientDetailsDto>> GetClientDetails([FromQuery] string id)
-        {
-            var result = await _serviceManager.ClientService.GetByIdAsync(id);
-            return HandleResult<ClientDetailsDto>(result);
-        }
-
+        
         [HttpGet("GetDecumentTechnician")]
         public async Task<ActionResult<GetDocumentDto>>GetDocument([FromQuery] string id)
         {

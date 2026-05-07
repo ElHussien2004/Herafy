@@ -218,7 +218,7 @@ namespace Service
 
             return Result<int>.Ok(count);
         }
-        public async Task<Result> CompleteOrder(int OrderId,IFormFile? WorkImage)
+        public async Task<Result> CompleteOrder(int OrderId)
         {
             using var transaction = await _unitOfWork.BeginTransactionAsync();
             try
@@ -243,22 +243,7 @@ namespace Service
                 }
 
                 order.Status = State.Completed;
-              
-               if(WorkImage ==null)
-               {
-                    _unitOfWork.OrderRepo.Update(order);
-               }
-               else
-               {
-                    var res = await _fileService.SaveFileAsync(WorkImage, "WorkImages");
-                    if (res.IsSuccess)
-                    {
-                        order.ImageWorkURL = res.Value;
-                    }
-                    _unitOfWork.OrderRepo.Update(order);
-                }
-                
-
+                _unitOfWork.OrderRepo.Update(order);
                 await _unitOfWork.SaveAsync();
                 await transaction.CommitAsync();
                 _logger.LogInformation("Order {OrderId} marked as COMPLETED. Technician: {TechId}", OrderId, order.TechnicianId);
@@ -428,6 +413,18 @@ namespace Service
 
           return Result<decimal>.Ok(totalPrice);
            
+        }
+
+        public async Task<Result<string>> UploadWorkImage(int OrderId ,IFormFile WorkImage)
+        {
+            var spec = new OrderWithDetailsSpecification(new OrderQuery { OrderId = OrderId });
+            var order = await _unitOfWork.OrderRepo.GetByIdAsync(spec);
+
+            if (order == null)
+                return Error.NotFound("الطلب غير موجود", "لا يمكن العثور على الطلب.");
+
+            var result = await _fileService.SaveFileAsync(WorkImage, "WorkImages");
+            return result;
         }
     }
 }
